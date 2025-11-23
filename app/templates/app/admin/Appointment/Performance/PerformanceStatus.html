@@ -1,0 +1,26 @@
+{% load static %}
+
+<div id="Instrument">
+    <form method="POST" action="{% url 'performance_Status' Performance.pk %}" class="admin-form">
+        <div class="form-layout">
+            <div class="form-right-section">
+                {% csrf_token %}
+                <h3>Update Performance Status</h3>
+                <p><strong>Event:</strong> {{ Performance.event_name }}</p>
+                <p><strong>Current Status:</strong> {{ Performance.status }}</p>
+                
+                <div class="form-group">
+                    <label for="id_status">Select New Status:</label>
+                    <select id="id_status" name="status" class="form-control" required>
+                        <option value="Pending" {% if performance.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Accepted" {% if performance.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                        <option value="Declined" {% if performance.status == 'Declined' %}selected{% endif %}>Declined</option>
+                        <option value="Completed" {% if performance.status == 'Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </div>
+        </div>
+    </form>
+</div>

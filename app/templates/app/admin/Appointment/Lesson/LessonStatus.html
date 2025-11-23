@@ -1,0 +1,26 @@
+{% load static %}
+
+<div id="Instrument">
+    <form method="POST" action="{% url 'Lesson_Status' Lesson.pk %}" class="admin-form">
+        <div class="form-layout">
+            <div class="form-right-section">
+                {% csrf_token %}
+                <h3>Update Lesson Status</h3>
+                <p><strong>Event:</strong> {{ Lesson.school_name }}</p>
+                <p><strong>Current Status:</strong> {{ Lesson.status }}</p>
+                
+                <div class="form-group">
+                    <label for="id_status">Select New Status:</label>
+                    <select id="id_status" name="status" class="form-control" required>
+                        <option value="Pending" {% if Lesson.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Accepted" {% if Lesson.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                        <option value="Declined" {% if Lesson.status == 'Declined' %}selected{% endif %}>Declined</option>
+                        <option value="Completed" {% if Lesson.status == 'Completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </div>
+        </div>
+    </form>
+</div>

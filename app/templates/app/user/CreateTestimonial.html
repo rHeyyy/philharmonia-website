@@ -1,0 +1,232 @@
+{% load static %}
+
+<style>
+    /* Main Container */
+    #Testimonial {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Form Layout */
+    .form-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    /* Form Groups */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Floating Label Styles */
+    .floating-label-group {
+        position: relative;
+    }
+
+    .floating-label {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        color: #6b7280;
+        font-size: 1rem;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        background: white;
+        padding: 0 4px;
+    }
+
+    /* Form Controls */
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background-color: white;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Floating Label Animation */
+    .form-control:focus + .floating-label,
+    .form-control:not(:placeholder-shown) + .floating-label {
+        top: -10px;
+        left: 10px;
+        font-size: 0.8rem;
+        color: #4f46e5;
+    }
+
+    /* Textarea Specific Styles */
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Star Rating Styles */
+    .star-rating-group {
+        margin: 1.5rem 0;
+    }
+
+    .star-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        font-size: 2rem;
+        color: #d1d5db;
+        cursor: pointer;
+        transition: color 0.2s;
+        margin-right: 4px;
+    }
+
+    .star-rating input:checked ~ label,
+    .star-rating input:hover ~ label {
+        color: #f59e0b;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: #f59e0b;
+    }
+
+    /* Button Styles */
+    .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #4f46e5;
+        color: white;
+        width: 100%;
+    }
+
+    .btn-primary:hover {
+        background-color: #4338ca;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    /* Select Dropdown Styles */
+    select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 1em;
+    }
+
+    /* Error Message */
+    #error-message-container {
+        margin-top: 1rem;
+        padding: 0.75rem;
+        border-radius: 6px;
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+</style>
+
+<div id="Testimonial">
+    <form method="POST" enctype="multipart/form-data" action="{% url 'CreateTestimonial' %}" class="admin-form">
+        <div class="form-layout">
+            <div class="form-right-section">
+                {% csrf_token %}
+                
+                <!-- Display current user (readonly) -->
+                <div class="form-group">
+                    <input type="text" 
+                           id="display_user" 
+                           class="form-control" 
+                           value="{{ current_user.username }}" 
+                           readonly>
+                    <label for="display_user" class="floating-label">Your Username</label>
+                    <input type="hidden" name="user" value="{{ current_user.id }}">
+                </div>
+
+                <!-- Message Field -->
+                <div class="form-group floating-label-group">
+                    <textarea id="id_message" name="message" class="form-control" rows="4" placeholder=" " required></textarea>
+                    <label for="id_message" class="floating-label">Testimonial Message</label>
+                </div>
+                
+                <!-- Role Field -->
+                <div class="form-group floating-label-group">
+                    <input type="text" id="id_role" name="role" class="form-control" placeholder=" " />
+                    <label for="id_role" class="floating-label">Role (e.g., Beginner, Advanced)</label>
+                </div>
+
+                <!-- Rating Field -->
+                <div class="form-group star-rating-group">
+                    <label class="star-label">Rating:</label>
+                    <div class="star-rating">
+                        {% for i in "54321" %}
+                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" />
+                        <label for="star{{ i }}" title="{{ i }} stars">★</label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary">Add Testimonial</button>
+                <div id="error-message-container" style="color: red; display: none; text-align: center;"></div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const starRatings = document.querySelectorAll('.star-rating');
+        
+        starRatings.forEach(rating => {
+            const inputs = rating.querySelectorAll('input[type="radio"]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    rating.setAttribute('data-rating', this.value);
+                });
+                
+                input.addEventListener('click', function() {
+                    const value = this.value;
+                    inputs.forEach(star => star.checked = false);
+                    inputs.forEach(star => {
+                        if (star.value >= value) {
+                            star.checked = true;
+                        }
+                    });
+                });
+            });
+        });
+    });
+</script>
