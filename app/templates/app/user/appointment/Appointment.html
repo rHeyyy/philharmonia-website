@@ -1,7 +1,7 @@
 {% load static %}
 
 <style>
-/* Container */
+/* ================== Container ================== */
 #InstrumentAppointContainer {
   width: 95%;
   max-width: 1000px;
@@ -21,7 +21,7 @@
   box-shadow: 0 8px 25px rgba(0,0,0,0.12);
 }
 
-/* Instructions Panel */
+/* ================== Instructions Panel ================== */
 .appoint-instructions {
   flex: 0 0 35%;
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -73,12 +73,15 @@
   object-fit: cover;
 }
 
-/* Form Panel */
+/* ================== Form Panel ================== */
 .appoint-form-panel {
   flex: 0 0 65%;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
 }
 
-/* Tabs header */
+/* ================== Tabs header ================== */
 .appoint-tabs-header {
   display: flex;
   gap: 0;
@@ -110,7 +113,7 @@
   height: 100%;
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   transform: translateY(100%);
-  transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   z-index: -1;
 }
 
@@ -123,10 +126,8 @@
   opacity: 0.1;
 }
 
-/* Hidden radio inputs */
 .appoint-tabs-header input[type="radio"] { display: none; }
 
-/* Active state */
 #appoint-tab-performance:checked ~ .appoint-tabs-header label[for="appoint-tab-performance"],
 #appoint-tab-lesson:checked ~ .appoint-tabs-header label[for="appoint-tab-lesson"] {
   color: #fff;
@@ -138,14 +139,13 @@
   opacity: 1;
 }
 
-/* Form area */
+/* ================== Form Area ================== */
 .appoint-form-area {
   padding: 20px;
   position: relative;
   overflow: hidden;
 }
 
-/* Form sections with animation */
 .appoint-form-section {
   display: none;
   animation: fadeIn 0.4s ease forwards;
@@ -162,13 +162,12 @@
   }
 }
 
-/* Show the one matching the checked radio */
 #appoint-tab-performance:checked ~ .appoint-form-area #appoint-performanceForm,
 #appoint-tab-lesson:checked ~ .appoint-form-area #appoint-lessonForm {
   display: block;
 }
 
-/* Floating label style */
+/* ================== Floating label ================== */
 .appoint-floating-label-group {
   position: relative;
   margin-bottom: 15px;
@@ -189,7 +188,7 @@
   outline: none;
   border-color: #4f46e5;
   background: #fff;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 2px 6px rgba(79,70,229,0.12);
   transform: translateY(-1px);
 }
 
@@ -205,7 +204,6 @@
   padding: 0 4px;
 }
 
-/* When input has value or focus, move label up */
 .appoint-form-control:focus + .appoint-floating-label,
 .appoint-form-control:not(:placeholder-shown) + .appoint-floating-label {
   top: -8px;
@@ -217,76 +215,40 @@
   transform: scale(0.95);
 }
 
-/* Textarea specific styles */
 .appoint-form-control textarea {
   resize: vertical;
   min-height: 80px;
 }
 
-/* Buttons */
-.appoint-btn-primary {
+/* ================== Buttons ================== */
+.appoint-btn-primary, .appoints-btn-cancel {
   display: block;
   width: 100%;
   padding: 10px;
   border: none;
   border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 8px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.appoint-btn-primary {
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: #fff;
-  font-weight: 600;
-  font-size: 13px;
-  margin-top: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(79,70,229,0.25);
 }
 
-.appoint-btn-primary::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.appoint-btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(79, 70, 229, 0.35);
-}
-
-.appoint-btn-primary:hover::before {
-  left: 100%;
-}
-
-.appoint-btn-primary:active {
-  transform: translateY(0);
-}
-
-/* CANCEL BUTTON */
-/* Cancel Button (Red) */
 .appoints-btn-cancel {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
   background: linear-gradient(135deg, #e63946 0%, #d90429 100%);
   color: #fff;
-  font-weight: 600;
-  font-size: 13px;
-  margin-top: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(230, 57, 70, 0.25);
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(230,57,70,0.25);
 }
 
-.appoints-btn-cancel::before {
+.appoint-btn-primary::before, .appoints-btn-cancel::before {
   content: '';
   position: absolute;
   top: 0;
@@ -297,22 +259,19 @@
   transition: left 0.5s ease;
 }
 
-.appoints-btn-cancel:hover {
+.appoint-btn-primary:hover, .appoints-btn-cancel:hover {
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(230, 57, 70, 0.35);
 }
 
-.appoints-btn-cancel:hover::before {
+.appoint-btn-primary:hover::before, .appoints-btn-cancel:hover::before {
   left: 100%;
 }
 
-.appoints-btn-cancel:active {
+.appoint-btn-primary:active, .appoints-btn-cancel:active {
   transform: translateY(0);
 }
 
-
-
-/* Form header */
+/* ================== Form Header ================== */
 .appoint-form-header {
   margin-bottom: 15px;
   text-align: center;
@@ -330,200 +289,54 @@
   color: #64748b;
 }
 
-/* Success animation for form submission */
-@keyframes successPulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
-  }
-}
-
-.appoint-btn-primary.success {
-  animation: successPulse 0.8s;
-}
-
-/* Enhanced Responsive Design */
+/* ================== Responsive ================== */
 @media (max-width: 992px) {
   #InstrumentAppointContainer {
     flex-direction: column;
     max-width: 600px;
   }
-  
-  .appoint-instructions {
-    flex: 0 0 auto;
-    padding: 18px;
-  }
-  
-  .appoint-form-panel {
-    flex: 0 0 auto;
-  }
-  
-  .appoint-instruction-image {
-    height: 120px;
-  }
+  .appoint-instructions, .appoint-form-panel { flex: 0 0 auto; }
+  .appoint-instruction-image { height: 120px; }
 }
 
 @media (max-width: 768px) {
-  #InstrumentAppointContainer {
-    margin: 10px auto;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    width: 97%;
-  }
-  
-  .appoint-form-area {
-    padding: 15px;
-  }
-  
-  .appoint-tab-label {
-    padding: 10px 8px;
-    font-size: 12px;
-  }
-  
-  .appoint-form-title {
-    font-size: 15px;
-    margin-bottom: 4px;
-  }
-  
-  .appoint-form-subtitle {
-    font-size: 11px;
-  }
-  
-  .appoint-floating-label-group {
-    margin-bottom: 12px;
-  }
-  
-  .appoint-form-control {
-    padding: 9px 10px;
-    font-size: 12px;
-  }
-  
-  .appoint-floating-label {
-    font-size: 12px;
-    left: 10px;
-    top: 9px;
-  }
-  
+  #InstrumentAppointContainer { width: 97%; margin: 10px auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .appoint-form-area { padding: 15px; max-height: 80vh; overflow-y: auto; } /* Scrollable on mobile */
+  .appoint-tab-label { padding: 10px 8px; font-size: 12px; }
+  .appoint-form-title { font-size: 15px; }
+  .appoint-form-subtitle { font-size: 11px; }
+  .appoint-floating-label-group { margin-bottom: 12px; }
+  .appoint-form-control { padding: 9px 10px; font-size: 12px; }
+  .appoint-floating-label { font-size: 12px; left: 10px; top: 9px; }
   .appoint-form-control:focus + .appoint-floating-label,
-  .appoint-form-control:not(:placeholder-shown) + .appoint-floating-label {
-    top: -6px;
-    font-size: 10px;
-  }
-  
-  .appoint-btn-primary {
-    padding: 9px;
-    font-size: 12px;
-    margin-top: 6px;
-  }
-  
-  .appoint-form-control textarea {
-    min-height: 70px;
-  }
-  
-  .appoint-instructions {
-    padding: 15px;
-  }
-  
-  .appoint-instructions h2 {
-    font-size: 18px;
-  }
-  
-  .appoint-instructions p, .appoint-instructions li {
-    font-size: 12px;
-  }
-  
-  .appoint-instruction-image {
-    height: 100px;
-    margin-top: 12px;
-  }
+  .appoint-form-control:not(:placeholder-shown) + .appoint-floating-label { top: -6px; font-size: 10px; }
+  .appoint-btn-primary, .appoints-btn-cancel { padding: 9px; font-size: 12px; margin-top: 6px; }
+  .appoint-form-control textarea { min-height: 70px; }
+  .appoint-instructions { padding: 15px; }
+  .appoint-instructions h2 { font-size: 18px; }
+  .appoint-instructions p, .appoint-instructions li { font-size: 12px; }
+  .appoint-instruction-image { height: 100px; margin-top: 12px; }
 }
 
 @media (max-width: 480px) {
-  #InstrumentAppointContainer {
-    margin: 8px auto;
-    border-radius: 6px;
-  }
-  
-  .appoint-form-area {
-    padding: 12px;
-  }
-  
-  .appoint-tab-label {
-    padding: 8px 6px;
-    font-size: 11px;
-  }
-  
-  .appoint-form-header {
-    margin-bottom: 12px;
-  }
-  
-  .appoint-form-title {
-    font-size: 14px;
-  }
-  
-  .appoint-form-subtitle {
-    font-size: 10px;
-  }
-  
-  .appoint-floating-label-group {
-    margin-bottom: 10px;
-  }
-  
-  .appoint-form-control {
-    padding: 8px 9px;
-    font-size: 11px;
-  }
-  
-  .appoint-btn-primary {
-    padding: 8px;
-    font-size: 11px;
-  }
-  
-  .appoint-instructions {
-    padding: 12px;
-  }
-  
-  .appoint-instructions h2 {
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  
-  .appoint-instructions p, .appoint-instructions li {
-    font-size: 11px;
-    margin-bottom: 8px;
-  }
-  
-  .appoint-instruction-image {
-    height: 80px;
-    margin-top: 10px;
-  }
+  #InstrumentAppointContainer { margin: 8px auto; border-radius: 6px; }
+  .appoint-form-area { padding: 12px; max-height: 70vh; overflow-y: auto; } /* Scrollable smaller screens */
+  .appoint-tab-label { padding: 8px 6px; font-size: 11px; }
+  .appoint-form-header { margin-bottom: 12px; }
+  .appoint-form-title { font-size: 14px; }
+  .appoint-form-subtitle { font-size: 10px; }
+  .appoint-floating-label-group { margin-bottom: 10px; }
+  .appoint-form-control { padding: 8px 9px; font-size: 11px; }
+  .appoint-btn-primary, .appoints-btn-cancel { padding: 8px; font-size: 11px; }
+  .appoint-instructions { padding: 12px; }
+  .appoint-instructions h2 { font-size: 16px; margin-bottom: 10px; }
+  .appoint-instructions p, .appoint-instructions li { font-size: 11px; margin-bottom: 8px; }
+  .appoint-instruction-image { height: 80px; margin-top: 10px; }
 }
 
-/* For very small screens */
-@media (max-width: 360px) {
-  .appoint-tabs-header {
-    flex-direction: column;
-  }
-  
-  .appoint-tab-label {
-    padding: 8px;
-  }
-  
-  .appoint-instructions ul {
-    padding-left: 15px;
-  }
-}
+/* Prevent horizontal scroll on mobile */
+html, body { max-width: 100%; overflow-x: hidden; }
 
-/* Prevent horizontal scrolling on mobile */
-html, body {
-  max-width: 100%;
-  overflow-x: hidden;
-}
 </style>
 
 <div id="InstrumentAppointContainer">
@@ -543,13 +356,7 @@ html, body {
     
     <div class="appoint-instruction-image">
       <!-- Replace with your actual image path -->
-      <img src="{% static 'images/appointment-guide.jpg' %}" alt="Appointment Guide" onerror="this.style.display='none'">
-      <div style="color: white; text-align: center; padding: 15px; display: flex; align-items: center; justify-content: center; height: 100%; width: 100%;">
-        <div>
-          <p style="margin-bottom: 8px; font-size: 14px;">Appointment Guide Image</p>
-          <p style="font-size: 11px;">(Replace with your image)</p>
-        </div>
-      </div>
+      <img src="{% static 'images/ghibli-style.jpg' %}" onerror="this.style.display='none'">
     </div>
   </div>
   

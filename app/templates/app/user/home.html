@@ -1093,10 +1093,6 @@ function updateViewButtonState(button, type, isPlaying) {
           {% endif %}
           <div>
             <h4>{{ testimonial.user.get_full_name|default:testimonial.user.username }}</h4>
-            <p>
-              {% if testimonial.role %}{{ testimonial.role }}{% endif %}
-              {% if testimonial.duration %}for {{ testimonial.duration }}{% endif %}
-            </p>
           </div>
         </div>
       </div>
@@ -1108,7 +1104,7 @@ function updateViewButtonState(button, type, isPlaying) {
     </div>
     
     <!-- Slider navigation - only show if there are testimonials -->
-    {% if testimonials %}
+   
     <div class="slider-nav">
       <button class="slider-prev" aria-label="Previous testimonials">❮</button>
 
@@ -1121,7 +1117,7 @@ function updateViewButtonState(button, type, isPlaying) {
       <div class="slider-dots1"></div>
       <button class="slider-next" aria-label="Next testimonials">❯</button>
     </div>
-    {% endif %}
+  
   </div>
 </div>
 
@@ -1137,88 +1133,117 @@ function updateViewButtonState(button, type, isPlaying) {
 
 
 <style>
-    .testimonial-btn {
-        padding: 12px 24px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        border-radius: 50px;
-        transition: all 0.4s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        position: relative;
-        overflow: hidden;
-        z-index: 1;
-        transform-style: preserve-3d;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        
-        /* Original colors with gradient enhancement */
-        background-color: #4F46E5;
-        background-image: linear-gradient(to right, #4F46E5, #6D65F0);
-        color: white;
-        text-decoration: none;
+ .testimonial-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    border-radius: 50px;
+    transition: all 0.4s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+    /* Gradient */
+    background-color: #4F46E5;
+    background-image: linear-gradient(to right, #4F46E5, #6D65F0);
+    color: white;
+    text-decoration: none;
+}
+
+.testimonial-btn:hover {
+    background-color: #4338CA;
+    background-image: linear-gradient(to right, #4338CA, #5B52D8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.testimonial-btn:active {
+    transform: translateY(0);
+}
+
+/* Ripple effect */
+.testimonial-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.testimonial-btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
     }
-    
-    .testimonial-btn:hover {
-        background-color: #4338CA;
-        background-image: linear-gradient(to right, #4338CA, #5B52D8);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
-    
-    .testimonial-btn:active {
-        transform: translateY(0);
-    }
-    
-    /* Optional ripple effect */
-    .testimonial-btn::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 5px;
-        height: 5px;
-        background: rgba(255, 255, 255, 0.5);
+    100% {
+        transform: scale(20);
         opacity: 0;
-        border-radius: 100%;
-        transform: scale(1, 1) translate(-50%);
-        transform-origin: 50% 50%;
     }
-    
-    .testimonial-btn:focus:not(:active)::after {
-        animation: ripple 1s ease-out;
+}
+
+/* --------------------------------------------
+    RESPONSIVENESS
+--------------------------------------------- */
+
+/* Tablet & small desktop (768px–1024px) */
+@media (max-width: 1024px) {
+    .testimonial-btn {
+        padding: 14px 28px;
+        font-size: 0.95rem;
     }
-    
-    @keyframes ripple {
-        0% {
-            transform: scale(0, 0);
-            opacity: 0.5;
-        }
-        100% {
-            transform: scale(20, 20);
-            opacity: 0;
-        }
+}
+
+/* Medium phones (480px and up) */
+@media (max-width: 768px) {
+    .testimonial-btn {
+        padding: 13px 26px;
+        font-size: 0.9rem;
     }
-    
-    /* Mobile responsiveness */
-    @media (min-width: 480px) {
-        .testimonial-btn {
-            padding: 15px 30px;
-            font-size: 1rem;
-            gap: 10px;
-        }
+}
+
+/* Small phones (375px–480px) */
+@media (max-width: 480px) {
+    .testimonial-btn {
+        padding: 12px 22px;
+        font-size: 0.88rem;
+        gap: 6px;
     }
-    
-    /* For very small devices */
-    @media (max-width: 360px) {
-        .testimonial-btn {
-            padding: 10px 20px;
-            font-size: 0.85rem;
-        }
+}
+
+/* Very small devices (iPhone SE, 320px–360px) */
+@media (max-width: 360px) {
+    .testimonial-btn {
+        padding: 10px 18px;
+        font-size: 0.82rem;
+        gap: 5px;
     }
+}
+/* Very small devices (iPhone SE, 320px–360px) */
+@media (max-width: 260px) {
+    .testimonial-btn {
+        padding: 8px 15px;
+        font-size: 0.50rem;
+        gap: 3px;
+    }
+}
 </style>
 
 

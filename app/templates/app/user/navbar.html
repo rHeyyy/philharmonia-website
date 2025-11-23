@@ -1,5 +1,5 @@
 {% load static %}
-
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Logout Modal -->
 <div id="logoutModal" class="modal">
   <div class="modal-content">
@@ -33,128 +33,7 @@
     </div>
 </div>
 
-<style>
-    /*=============== Update Modal For User ===============*/
-.dp-modal-user {
-    position: fixed;
-    top: 330px;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, transform 0.4s var(--transition);
-    transform: translateY(0);
-}
 
-.dp-modal-user.hide {
-    transform: translateY(-100px);
-    opacity: 0;
-    pointer-events: none;
-}
-
-.dp-modal-user.dp-show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.dp-modal-content-user {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 700px;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transform: translateY(-20px);
-    opacity: 0;
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.dp-modal-user.dp-show .dp-modal-content-user {
-    transform: translateY(0);
-    opacity: 1;
-}
-
-/*=============== Close Button Modal For User ===============*/
-.dp-close-btn {
-    position: absolute;
-    top: 5px;
-    right: 15px;
-    font-size: 2.2rem;
-    font-weight: bold;
-    color: var(--text-color);
-    cursor: pointer;
-    z-index: 1050;
-    transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.dp-close-btn:hover {
-    color: var(--text-color1);
-    transform: scale(1.2);
-}
-
-/* Profile Images */
-.dp-profile-img-def {
-    height: 32px;
-    width: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    transition: transform 0.3s;
-}
-
-.dp-profile-img-def:hover {
-    transform: scale(1.05);
-}
-
-.dp-profile-img {
-    height: 32px;
-    width: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    transition: transform 0.3s;
-}
-
-.dp-profile-img:hover {
-    transform: scale(1.05);
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .dp-modal-content-user {
-        padding: 15px;
-        width: 95%;
-        top: 150px;
-        max-height: 85vh;
-    }
-    
-    .dp-close-btn {
-        font-size: 1.8rem;
-        right: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .dp-modal-content-user {
-        padding: 12px;
-        width: 95%;
-        top: 150px;
-        max-height: 80vh;
-    }
-    
-    .dp-close-btn {
-        font-size: 1.5rem;
-        top: 3px;
-        right: 8px;
-    }
-}
-</style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -617,20 +496,6 @@ document.addEventListener("DOMContentLoaded", () => {
         transform: rotate(180deg);
     }
     
-    /* Hide text on smaller tablets */
-    @media (max-width: 860px) {
-        .nav-text {
-            display: none;
-        }
-        
-        .navbar a {
-            padding: 8px;
-        }
-        
-        .logout-btn .nav-text {
-            display: inline;
-        }
-    }
 }
 
 @media (max-width: 768px) {

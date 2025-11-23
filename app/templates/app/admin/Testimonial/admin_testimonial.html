@@ -137,14 +137,6 @@
                                 <span class="detail-value">{{ testimonial.message|truncatewords:20 }}</span>
                             </div>
                             <div class="instrument-detail">
-                                <span class="detail-label">Role:</span>
-                                <span class="detail-value">{{ testimonial.role }}</span>
-                            </div>
-                            <div class="instrument-detail">
-                                <span class="detail-label">Duration:</span>
-                                <span class="detail-value">{{ testimonial.duration }}</span>
-                            </div>
-                            <div class="instrument-detail">
                                 <span class="detail-label">Approved:</span>
                                 <form method="POST" action="{% url 'testimonial_approval' testimonial.pk %}" class="approval-form">
                                     {% csrf_token %}
@@ -177,8 +169,6 @@
                                 <th>User</th>
                                 <th>Rating</th>
                                 <th>Message</th>
-                                <th>Role</th>
-                                <th>Duration</th>
                                 <th>Date Submitted</th>
                                 <th>Approved</th>
                                 <th>Actions</th>
@@ -190,8 +180,6 @@
                                 <td>{{ testimonial.user.username }}</td>
                                 <td>{{ testimonial.rating }} Star{{ testimonial.rating|pluralize }}</td>
                                 <td>{{ testimonial.message|truncatewords:15 }}</td>
-                                <td>{{ testimonial.role }}</td>
-                                <td>{{ testimonial.duration }}</td>
                                 <td>{{ testimonial.date_submitted|date:"M d, Y" }}</td>
                                 <td>
                                     <form method="POST" action="{% url 'testimonial_approval' testimonial.pk %}" class="approval-form">

@@ -656,6 +656,147 @@
     margin: 0 auto;
   }
 
+/* ----------------------------------------------------
+   FINAL RESPONSIVE FIXES FOR ALL DEVICES (320px+)
+---------------------------------------------------- */
+
+/* Fix scaling for the front hero section */
+@media (max-width: 480px) {
+  .front {
+    height: 90vh;
+  }
+
+  .text-overlay {
+    padding: 0 4%;
+    text-align: center;
+    background: rgba(0,0,0,0.55);
+  }
+
+  .text-overlay h1 {
+    font-size: 2.2rem !important;
+  }
+
+  .text-overlay p {
+    font-size: 0.9rem !important;
+    line-height: 1.5;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .read-btn,
+  .sound-btn {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 0.8rem 1.2rem;
+    justify-content: center;
+  }
+
+  .social-icons {
+    display: flex;
+    gap: 1rem;
+    flex-direction: row;
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: 20px;
+    transform: translateX(-50%);
+  }
+
+  .social-icons a {
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Fix extremely small phones (320px - 360px) */
+@media (max-width: 360px) {
+
+  .text-overlay h1 {
+    font-size: 1.9rem !important;
+  }
+
+  .text-overlay p {
+    font-size: 0.8rem !important;
+  }
+
+  .read-btn,
+  .sound-btn {
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .FrontLmodal-content {
+    width: 95% !important;
+    padding: 10px;
+  }
+
+  .FrontLmodal-content .FrontLleft-section h2 {
+    font-size: 1.1rem !important;
+    margin-bottom: 15px;
+  }
+
+  .FrontLmodal-content .FrontLright-section {
+    padding: 15px !important;
+  }
+
+  .FrontLlogin-input-group input,
+  .FrontLinput-group input {
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  .FrontLmodal-content .FrontLright-section button {
+    width: 100%;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+  }
+
+  .FrontLclose {
+    width: 26px;
+    height: 26px;
+    font-size: 1.2rem;
+  }
+}
+
+/* Better responsiveness for tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .text-overlay {
+    padding-left: 8%;
+  }
+
+  .text-overlay h1 {
+    font-size: 3.2rem;
+  }
+
+  .text-overlay p {
+    font-size: 1.05rem;
+  }
+
+  .FrontLmodal-content {
+    max-width: 700px;
+  }
+}
+
+/* Fix modal center alignment for all screens */
+@media (max-width: 768px) {
+  .FrontLmodal {
+    padding-top: 40px;
+  }
+
+  .FrontLmodal-content {
+    margin: auto;
+  }
+}
+
+/* Ensure modal never breaks layout */
+.FrontLmodal-content {
+  max-width: 95%;
+  width: 750px;
+}
 
 
       /* Google Login Popup Styles */
