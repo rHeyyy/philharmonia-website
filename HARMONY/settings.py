@@ -13,7 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-secret-for-dev')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.railway.app', '.up.railway.app']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.railway.app', '.up.railway.app', "philharmonia-website-production.up.railway.app"]
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://philharmonia-website-production.up.railway.app",
+    "https://*.railway.app",
+]
+
 
 # APPLICATION DEFINITION
 INSTALLED_APPS = [
