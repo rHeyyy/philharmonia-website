@@ -200,7 +200,7 @@ class Instrument(models.Model):
     category = models.ForeignKey('InstrumentCategory', on_delete=models.CASCADE, related_name='instruments')
     region = models.ForeignKey('Region', on_delete=models.SET_NULL, null=True, blank=True, related_name='instruments')
     province = models.CharField(max_length=50, choices=PH_PROVINCES, blank=True, null=True)
-    image = models.ImageField(upload_to='instruments/images/', blank=True, null=True)
+    image = models.ImageField(upload_to='images/instruments/images/', blank=True, null=True)
     date_added = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
 
@@ -245,7 +245,7 @@ class Instrument3DModel(models.Model):
         related_name='three_d'
     )
     file = models.FileField(
-        upload_to='instruments/3d_models/',
+        upload_to='images/instruments/3d_models/',
         blank=True,
         null=True,
         help_text="Upload a 3D model file (.glb, .gltf)"
@@ -260,7 +260,7 @@ class Site3DContent(models.Model):
     hero_description = models.TextField(default="Explore our gallery of authentic Filipino musical heritage with sound samples")
     about_title = models.CharField(max_length=200, default="Preserving Philippine Musical Heritage")
     about_content = models.TextField(default="This project aims to digitally preserve and showcase the rich variety of traditional Philippine musical instruments through images and authentic sound recordings.")
-    about_image = models.ImageField(upload_to='site_content/', default='site_content/prin.jpg')
+    about_image = models.ImageField(upload_to='images/site_content/', default='site_content/prin.jpg')
     
     class Meta:
         verbose_name_plural = "Site Content"
@@ -301,7 +301,7 @@ class PageSection(models.Model):
     section_type = models.CharField(max_length=20, choices=SECTION_TYPE_CHOICES)
     title = models.CharField(max_length=200, blank=True, null=True)
     content = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='page_sections/', blank=True, null=True)
+    image = models.ImageField(upload_to='images/page_sections/', blank=True, null=True)
     order = models.PositiveIntegerField(default=0)
     
     class Meta:
@@ -322,7 +322,7 @@ class PageSection(models.Model):
 class Sound(models.Model):
     instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE)
     title = models.TextField(blank=True)
-    sound_sample = models.FileField(upload_to='instruments/sounds/', blank=True, null=True)
+    sound_sample = models.FileField(upload_to='images/instruments/sounds/', blank=True, null=True)
     # date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -422,7 +422,7 @@ class InstrumentImage(models.Model):
         choices=VIEW_TYPE_CHOICES,
         default='other'
     )
-    image = models.ImageField(upload_to='instruments/detailed/images/', blank=True, null=True)
+    image = models.ImageField(upload_to='images/instruments/detailed/images/', blank=True, null=True)
     caption = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -487,7 +487,7 @@ class VideoTutorial(models.Model):
     instrument = models.ForeignKey(Instrument, on_delete=models.CASCADE, related_name='video_tutorials')
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    video_file = models.FileField(upload_to='videos/tutorials/', help_text="Upload an MP4 video file")
+    video_file = models.FileField(upload_to='images/videos/tutorials/', help_text="Upload an MP4 video file")
     uploaded_at = models.DateTimeField(auto_now_add=True)
     views = models.IntegerField(default=0)
 
@@ -541,7 +541,7 @@ class GuidingPrinciples(models.Model):
     description = models.TextField(
         default="We believe in the transformative power of music education to enrich lives and build communities."
     )
-    image = models.ImageField(upload_to='images/', blank=True, null=True)
+    image = models.ImageField(upload_to='images/images/', blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -585,12 +585,12 @@ class PrincipleCard(models.Model):
 class DiscoverSection(models.Model):
     title = models.CharField(max_length=255, default="Discover Traditional Instruments")
     description = models.TextField()
-    image = models.ImageField(upload_to='images/', blank=True, null=True)
+    image = models.ImageField(upload_to='images/images/', blank=True, null=True)
     mastering_title = models.CharField(max_length=255, default="Mastering")
     mastering_paragraph1 = models.TextField()
     mastering_paragraph2 = models.TextField()
-    video1 = models.FileField(upload_to='videos/', blank=True, null=True)
-    video2 = models.FileField(upload_to='videos/', blank=True, null=True)
+    video1 = models.FileField(upload_to='images/videos/', blank=True, null=True)
+    video2 = models.FileField(upload_to='images/videos/', blank=True, null=True)
     video_description = models.TextField(default="Listen to the mesmerizing tones of traditional sitar music")
 
     def __str__(self):
@@ -746,7 +746,7 @@ class TargetAudience(models.Model):
 class TeamMember(models.Model):
     name = models.CharField(max_length=100)
     title = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='team/', default='team/phil.png')
+    image = models.ImageField(upload_to='images/team/', default='team/phil.png')
     back_description = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
 
