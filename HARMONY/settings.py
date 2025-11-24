@@ -200,7 +200,7 @@ if os.environ.get("RAILWAY_ENVIRONMENT"):
     AWS_S3_ENDPOINT_URL = "https://0b418dde0bb4950435f6df4b43427951.r2.cloudflarestorage.com"
     AWS_S3_REGION_NAME = "auto"
 
-    AWS_S3_CUSTOM_DOMAIN = "0b418dde0bb4950435f6df4b43427951.r2.cloudflarestorage.com/philharmonia-media"
+    AWS_S3_CUSTOM_DOMAIN = "pub-a8c070b615064b4391ac33a8916b8b24.r2.dev"
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
     AWS_S3_OBJECT_PARAMETERS = {
