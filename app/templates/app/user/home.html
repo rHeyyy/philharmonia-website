@@ -609,7 +609,7 @@ document.addEventListener("DOMContentLoaded", () => {
           {% if discover_section.image %}
           <img src="{{ discover_section.image.url }}" alt="..." />
         {% else %}
-          <img src="{% static 'images/Phil.png' %}" alt="..." />
+          <img src="{% static 'images/phil.png' %}" alt="..." />
         {% endif %}
         </div>
         <div class="description">
@@ -1532,10 +1532,5 @@ function updateViewButtonState(button, type, isPlaying) {
   }
 }
 </style>
-<!-- MAP Scripts -->
-<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/geodata/philippinesLow.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
 
 {% endblock content %}

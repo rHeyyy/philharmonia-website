@@ -1,22 +1,7 @@
 {% extends 'app/login/FrontPage.html' %}
 {% load static %}
 {% block content %}
-    <style>
-        /* Your existing CSS remains the same */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
+    <style>        
         .container {
             width: 90%;
             max-width: 1200px;
@@ -29,7 +14,7 @@
             height: 70vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/images/3d.jpg');
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/images/ABOUT.jpg');
             background-size: cover;
             background-position: cover;
             color: white;
@@ -561,7 +546,7 @@
 
 /* Container spacing fix */
 @media (max-width: 480px) {
-  .threeD-container {
+  .container {
     width: 95%;
     padding: 0 10px;
   }
@@ -569,25 +554,25 @@
 
 /* HERO (Phones & Tablets) */
 @media (max-width: 768px) {
-  .threeD-hero {
+  .hero {
     height: 60vh;
     padding-top: 60px;
   }
 
-  .threeD-hero-content {
+  .hero-content {
     padding: 0 15px;
   }
 
-  .threeD-hero h1 {
+  .hero h1 {
     font-size: 2.3rem;
   }
 
-  .threeD-hero p {
+  .hero p {
     font-size: 1rem;
     line-height: 1.5;
   }
 
-  .threeD-btn {
+  .btn {
     width: 100%;
     padding: 12px;
     font-size: 0.9rem;
@@ -597,62 +582,62 @@
 
 /* HERO for extra small phones (iPhone SE, 320px width) */
 @media (max-width: 360px) {
-  .threeD-hero {
+  .hero {
     height: 55vh;
   }
 
-  .threeD-hero h1 {
+  .hero h1 {
     font-size: 1.9rem;
   }
 
-  .threeD-hero p {
+  .hero p {
     font-size: 0.85rem;
   }
 }
 
 /* GALLERY - Better scaling on narrow screens */
 @media (max-width: 768px) {
-  .threeD-section-title {
+  .section-title {
     font-size: 2rem;
   }
 
-  .threeD-instruments-grid {
+  .instruments-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
 
-  .threeD-instrument-card {
+  .instrument-card {
     border-radius: 8px;
   }
 
-  .threeD-instrument-image-container {
+  .instrument-image-container {
     height: 250px;
   }
 }
 
 /* Very small screens (single column + smaller images) */
 @media (max-width: 360px) {
-  .threeD-instrument-image-container {
+  .instrument-image-container {
     height: 200px;
   }
 
-  .threeD-instrument-info h3 {
+  .instrument-info h3 {
     font-size: 1.2rem;
   }
 }
 
 /* ABOUT SECTION (phones) */
 @media (max-width: 768px) {
-  .threeD-about {
+  .about {
     padding: 60px 0;
   }
 
-  .threeD-about-content {
+  .about-content {
     flex-direction: column;
     gap: 30px;
   }
 
-  .threeD-about-text h2 {
+  .about-text h2 {
     font-size: 1.6rem;
     text-align: center;
   }
@@ -664,17 +649,17 @@
 
 /* Medium screens (tablets) */
 @media (max-width: 992px) {
-  .threeD-modal-content {
+  .modal-content {
     width: 95%;
     height: 85vh;
     flex-direction: column;
   }
 
-  .threeD-modal-image-container {
+  .modal-image-container {
     height: 50%;
   }
 
-  .threeD-modal-sound-panel {
+  .modal-sound-panel {
     height: 50%;
     padding: 20px;
   }
@@ -682,24 +667,24 @@
 
 /* Phones (full stacked modal) */
 @media (max-width: 768px) {
-  .threeD-modal-content {
+  .modal-content {
     height: 90vh;
   }
 
-  .threeD-modal-image-container {
+  .modal-image-container {
     height: 40%;
   }
 
-  .threeD-modal-sound-panel {
+  .modal-sound-panel {
     height: 60%;
     padding: 15px;
   }
 
-  .threeD-sound-panel-title {
+  .sound-panel-title {
     font-size: 1.3rem;
   }
 
-  .threeD-close-modal {
+  .close-modal {
     width: 40px;
     height: 40px;
     font-size: 1.5rem;
@@ -708,20 +693,20 @@
 
 /* Small phones (320–360px) */
 @media (max-width: 360px) {
-  .threeD-modal-content {
+  .modal-content {
     width: 97%;
   }
 
-  .threeD-modal-sound-btn {
+  .modal-sound-btn {
     padding: 8px 10px;
     font-size: 0.85rem;
   }
 
-  .threeD-modal-info h3 {
+  .modal-info h3 {
     font-size: 1.2rem;
   }
 
-  .threeD-info-toggle-btn {
+  .info-toggle-btn {
     width: 35px;
     height: 35px;
   }
@@ -731,12 +716,12 @@
    PAGINATION FIX
 ------------------------------------------------ */
 @media (max-width: 480px) {
-  .threeD-pagination-controls {
+  .pagination-controls {
     flex-direction: column;
     gap: 10px;
   }
 
-  .threeD-pagination-btn {
+  .pagination-btn {
     width: 100%;
     justify-content: center;
     padding: 12px;

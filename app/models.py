@@ -260,7 +260,7 @@ class Site3DContent(models.Model):
     hero_description = models.TextField(default="Explore our gallery of authentic Filipino musical heritage with sound samples")
     about_title = models.CharField(max_length=200, default="Preserving Philippine Musical Heritage")
     about_content = models.TextField(default="This project aims to digitally preserve and showcase the rich variety of traditional Philippine musical instruments through images and authentic sound recordings.")
-    about_image = models.ImageField(upload_to='images/site_content/', default='site_content/prin.jpg')
+    about_image = models.ImageField(upload_to='images/site_content/', blank=True, null=True)
     
     class Meta:
         verbose_name_plural = "Site Content"

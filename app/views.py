@@ -2099,12 +2099,16 @@ class Create3dContent(LoginRequiredMixin, CreateView):
     template_name = 'app/admin/3d Content/Create3dContent.html'
     success_url = reverse_lazy('admin_main')
    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pass the first object if it exists, otherwise None
+        context['sitecontent'] = Site3DContent.objects.first()
+        return context
+
     def form_valid(self, form):
         if form.is_valid():
             return super().form_valid(form)
-        return super().form_invalid(form)
-    
-        
+        return super().form_invalid(form)       
 
 class Update3dContent(LoginRequiredMixin, UpdateView):
     model = Site3DContent
@@ -2113,12 +2117,13 @@ class Update3dContent(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('admin_main')
     context_object_name = "sitecontent"
 
-   
 class Delete3dContent(LoginRequiredMixin, DeleteView):
     model = Site3DContent
     template_name = 'app/admin/3d Content/Delete3dContent.html'
     success_url = reverse_lazy('admin_main')
     context_object_name = "sitecontent"
+
+
 
 # INSTRUMENT LINKS
 @login_required

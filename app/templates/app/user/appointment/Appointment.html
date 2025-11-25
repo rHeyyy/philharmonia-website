@@ -300,8 +300,17 @@
 }
 
 @media (max-width: 768px) {
-  #InstrumentAppointContainer { width: 97%; margin: 10px auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-  .appoint-form-area { padding: 15px; max-height: 80vh; overflow-y: auto; } /* Scrollable on mobile */
+  #InstrumentAppointContainer {
+    width: 97%;
+    margin: 10px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  .appoint-form-area {
+    padding: 15px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
   .appoint-tab-label { padding: 10px 8px; font-size: 12px; }
   .appoint-form-title { font-size: 15px; }
   .appoint-form-subtitle { font-size: 11px; }
@@ -319,8 +328,28 @@
 }
 
 @media (max-width: 480px) {
-  #InstrumentAppointContainer { margin: 8px auto; border-radius: 6px; }
-  .appoint-form-area { padding: 12px; max-height: 70vh; overflow-y: auto; } /* Scrollable smaller screens */
+  #InstrumentAppointContainer {
+    flex-direction: column;       /* Stack vertically */
+    overflow-y: auto;             /* Enable vertical scroll if content overflows */
+    max-height: 90vh;             /* Limit height to viewport */
+    width: 100%;
+    margin: 8px auto;
+    border-radius: 6px;
+    padding: 10px 0;
+  }
+
+  .appoint-instructions, .appoint-form-panel {
+    flex: 0 0 auto;
+    width: 95%;                  /* Full width */
+    margin: 0 auto;
+  }
+
+  .appoint-form-area {
+    padding: 12px;
+    max-height: 70vh;             /* Scroll inside form if needed */
+    overflow-y: auto;
+  }
+
   .appoint-tab-label { padding: 8px 6px; font-size: 11px; }
   .appoint-form-header { margin-bottom: 12px; }
   .appoint-form-title { font-size: 14px; }
@@ -334,7 +363,7 @@
   .appoint-instruction-image { height: 80px; margin-top: 10px; }
 }
 
-/* Prevent horizontal scroll on mobile */
+/* Prevent horizontal scroll on body */
 html, body { max-width: 100%; overflow-x: hidden; }
 
 </style>

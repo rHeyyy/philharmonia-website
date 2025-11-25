@@ -8,9 +8,30 @@
 
 // MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS
 am4core.ready(function () {
+    // Check if required libraries are loaded
+    if (typeof am4core === 'undefined' || typeof am4maps === 'undefined' || typeof am4geodata_philippinesLow === 'undefined') {
+        console.error('Required amCharts libraries not loaded');
+        const loadingElement = document.querySelector('.loading-animation');
+        if (loadingElement) {
+            loadingElement.innerHTML = '<p>Error loading map libraries. Please refresh the page.</p>';
+        }
+        return;
+    }
+
     am4core.useTheme(am4themes_animated);
 
     var chart = am4core.create("chartdiv", am4maps.MapChart);
+    
+    // Check if geodata is available
+    if (!am4geodata_philippinesLow || !am4geodata_philippinesLow.features) {
+        console.error('Philippines geodata not loaded properly');
+        const loadingElement = document.querySelector('.loading-animation');
+        if (loadingElement) {
+            loadingElement.innerHTML = '<p>Error loading map data. Please refresh the page.</p>';
+        }
+        return;
+    }
+
     chart.geodata = am4geodata_philippinesLow;
     chart.projection = new am4maps.projections.Miller();
 
@@ -23,14 +44,68 @@ am4core.ready(function () {
     polygonTemplate.stroke = am4core.color("#000000");
     polygonTemplate.strokeWidth = 0.5;
 
+    // Function to normalize province names for matching
+    function normalizeProvinceName(name) {
+        if (!name) return '';
+        return name
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '') // Remove special characters and spaces
+            .trim();
+    }
+
+    // Store provinces with instruments for later use
+    let provincesWithInstrumentsData = [];
+
+    // Function to apply colors directly to map polygons
+    function applyColorsToMap() {
+        console.log("Applying colors to map polygons...");
+        
+        polygonSeries.mapPolygons.each(function(polygon) {
+            if (polygon.dataItem && polygon.dataItem.dataContext) {
+                const provinceName = polygon.dataItem.dataContext.name;
+                const normalizedProvinceName = normalizeProvinceName(provinceName);
+                const normalizedProvincesWithInstruments = provincesWithInstrumentsData.map(province => 
+                    normalizeProvinceName(province)
+                );
+                
+                const hasInstrument = normalizedProvincesWithInstruments.includes(normalizedProvinceName);
+                
+                // Apply color directly to the polygon
+                polygon.fill = hasInstrument ? am4core.color("#1E90FF") : am4core.color("#d3d3d3");
+                
+                console.log(`Applied color to ${provinceName}: ${hasInstrument ? 'BLUE' : 'GRAY'}`);
+            }
+        });
+        
+        // Force the chart to redraw
+        chart.invalidateData();
+    }
+
+    // Enhanced hover effects
     polygonTemplate.events.on("over", function (ev) {
-        ev.target.originalFill = ev.target.fill;
-        ev.target.fill = am4core.color("#f2d974");
+        if (ev.target) {
+            ev.target.originalFill = ev.target.fill;
+            ev.target.fill = am4core.color("#f2d974");
+            
+            // Hide the hover instruction when user starts interacting
+            const hoverInstruction = document.getElementById('hover-instruction');
+            if (hoverInstruction) {
+                hoverInstruction.style.display = 'none';
+            }
+        }
     });
 
     polygonTemplate.events.on("out", function (ev) {
-        const hasInstrument = ev.target.dataItem.dataContext.has_instrument;
-        ev.target.fill = hasInstrument ? am4core.color("#1E90FF") : am4core.color("#d3d3d3");
+        if (ev.target && ev.target.dataItem && ev.target.dataItem.dataContext) {
+            const provinceName = ev.target.dataItem.dataContext.name;
+            const normalizedProvinceName = normalizeProvinceName(provinceName);
+            const normalizedProvincesWithInstruments = provincesWithInstrumentsData.map(province => 
+                normalizeProvinceName(province)
+            );
+            
+            const hasInstrument = normalizedProvincesWithInstruments.includes(normalizedProvinceName);
+            ev.target.fill = hasInstrument ? am4core.color("#1E90FF") : am4core.color("#d3d3d3");
+        }
     });
 
     function updateInstrumentPanel(provinceName, data) {
@@ -38,20 +113,42 @@ am4core.ready(function () {
         const provinceNameElement = document.getElementById("province-name");
         const provinceDescription = document.getElementById("province-description");
         const noInstruments = document.querySelector(".no-instruments");
-        const culturalGroupTag = document.getElementById("cultural-group").querySelector("span");
+        const culturalGroupElement = document.getElementById("cultural-group");
+        const culturalGroupTag = culturalGroupElement ? culturalGroupElement.querySelector("span") : null;
 
-        provinceNameElement.innerText = `Instruments from ${provinceName}`;
-        provinceDescription.innerText = `This region is known for the following instruments:`;
+        // Null checks for all DOM elements
+        if (provinceNameElement) {
+            provinceNameElement.innerText = `Instruments from ${provinceName}`;
+        }
+        
+        if (provinceDescription) {
+            if (data.length === 0) {
+                provinceDescription.innerText = `No traditional instruments found for ${provinceName}.`;
+            } else {
+                provinceDescription.innerText = `This region is known for the following instruments:`;
+            }
+        }
 
-        culturalGroupTag.textContent = data.length > 0 && data[0].region ? data[0].region : "---";
+        if (culturalGroupTag) {
+            culturalGroupTag.textContent = data.length > 0 && data[0].region ? data[0].region : "---";
+        }
 
-        instrumentList.innerHTML = '';
-        instrumentList.style.display = 'grid';
-        noInstruments.style.display = 'none';
+        if (instrumentList) {
+            instrumentList.innerHTML = '';
+            instrumentList.style.display = 'grid';
+        }
+        
+        if (noInstruments) {
+            noInstruments.style.display = 'none';
+        }
 
         if (data.length === 0) {
-            instrumentList.style.display = 'none';
-            noInstruments.style.display = 'block';
+            if (instrumentList) {
+                instrumentList.style.display = 'none';
+            }
+            if (noInstruments) {
+                noInstruments.style.display = 'block';
+            }
         } else {
             data.forEach(item => {
                 const card = document.createElement('div');
@@ -63,39 +160,144 @@ am4core.ready(function () {
                         <p>${item.name}</p>
                     </a>
                 `;
-                instrumentList.appendChild(card);
+                if (instrumentList) {
+                    instrumentList.appendChild(card);
+                }
             });
         }
     }
 
     function loadProvinceData(provinceName) {
-        fetch(`/api/instruments/province/?province_name=${provinceName}`)
-            .then(response => response.json())
-            .then(data => updateInstrumentPanel(provinceName, data));
+        fetch(`/api/instruments/province/?province_name=${encodeURIComponent(provinceName)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => updateInstrumentPanel(provinceName, data))
+            .catch(error => {
+                console.error('Error loading province data:', error);
+                updateInstrumentPanel(provinceName, []);
+            });
     }
 
     fetch('/api/instruments/provinces-with-instruments/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(provincesWithInstruments => {
+            console.log('Provinces with instruments from API:', provincesWithInstruments);
+            
+            // Store the data for later use
+            provincesWithInstrumentsData = provincesWithInstruments;
+            
+            // Hide loading animation
+            const loadingElement = document.querySelector('.loading-animation');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+
+            // Create the data structure WITH COLORS
             polygonSeries.data = polygonSeries.geodata.features.map(feature => {
                 const provinceName = feature.properties.name;
-                const hasInstrument = provincesWithInstruments.includes(provinceName);
+                const normalizedProvinceName = normalizeProvinceName(provinceName);
+                const normalizedProvincesWithInstruments = provincesWithInstruments.map(province => 
+                    normalizeProvinceName(province)
+                );
+                
+                const hasInstrument = normalizedProvincesWithInstruments.includes(normalizedProvinceName);
+                
+                console.log(`Province: ${provinceName} - Has instruments: ${hasInstrument}`);
+                
                 return {
                     id: feature.id,
                     name: provinceName,
                     has_instrument: hasInstrument,
-                    fill: hasInstrument ? am4core.color("#1E90FF") : am4core.color("#d3d3d3")
+                    // ADD THIS LINE - Set the color in the data
+                    fill: hasInstrument ? "#1E90FF" : "#d3d3d3"
                 };
             });
 
+            // ADD THIS LINE - Tell amCharts to use the fill property from data
+            polygonTemplate.propertyFields.fill = "fill";
+
+            // Apply colors immediately
+            applyColorsToMap();
+
+            // Apply colors when chart is ready
+            chart.events.on("ready", function() {
+                applyColorsToMap();
+            });
+
+            // Auto-select the first province with instruments if available
             if (provincesWithInstruments.length > 0) {
+                console.log(`Auto-selecting first province with instruments: ${provincesWithInstruments[0]}`);
                 loadProvinceData(provincesWithInstruments[0]);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching provinces with instruments:', error);
+            
+            // Hide loading animation and show error
+            const loadingElement = document.querySelector('.loading-animation');
+            if (loadingElement) {
+                loadingElement.innerHTML = '<p>Error loading map data. Please try again later.</p>';
             }
         });
 
     polygonTemplate.events.on("hit", function (ev) {
-        const provinceName = ev.target.dataItem.dataContext.name;
-        loadProvinceData(provinceName);
+        if (ev.target && ev.target.dataItem && ev.target.dataItem.dataContext) {
+            const provinceName = ev.target.dataItem.dataContext.name;
+            console.log(`Clicked on province: ${provinceName}`);
+            loadProvinceData(provinceName);
+            
+            // Hide the hover instruction when user clicks
+            const hoverInstruction = document.getElementById('hover-instruction');
+            if (hoverInstruction) {
+                hoverInstruction.style.display = 'none';
+            }
+        }
+    });
+
+    // Add a legend and hover instruction to the map
+    chart.events.on("ready", function() {
+        const chartDiv = document.getElementById('chartdiv');
+        
+        // Add hover instruction
+        const hoverInstruction = document.createElement('div');
+        hoverInstruction.id = 'hover-instruction';
+        hoverInstruction.innerHTML = `
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 10px 20px; border-radius: 25px; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 1000; text-align: center; border: 2px solid #1E90FF;">
+                <span style="color: #1E90FF; font-weight: bold;">💡 Explore the map! Hover over provinces to discover traditional instruments</span>
+            </div>
+        `;
+        if (chartDiv) {
+            chartDiv.appendChild(hoverInstruction);
+        }
+
+        // Add legend - only show if there are provinces with instruments
+        if (provincesWithInstrumentsData.length > 0) {
+            const legend = document.createElement('div');
+            legend.innerHTML = `
+                <div style="position: absolute; bottom: 10px; left: 10px; background: white; padding: 10px; border-radius: 5px; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 1000;">
+                    <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                        <div style="width: 15px; height: 15px; background: #1E90FF; margin-right: 5px; border: 1px solid #000;"></div>
+                        <span>Has Instruments</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div style="width: 15px; height: 15px; background: #d3d3d3; margin-right: 5px; border: 1px solid #000;"></div>
+                        <span>No Instruments</span>
+                    </div>
+                </div>
+            `;
+            if (chartDiv) {
+                chartDiv.appendChild(legend);
+            }
+        }
     });
 
     chart.chartContainer.wheelable = false;
@@ -114,8 +316,6 @@ am4core.ready(function () {
         chart.invalidateSize();
     });
 });
-
-
   // MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS
   // MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS// MAP JS
 
