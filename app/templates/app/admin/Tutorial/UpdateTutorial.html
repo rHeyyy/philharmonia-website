@@ -28,6 +28,18 @@
             <!-- Right Section: Form Fields -->
             <div class="form-right-section">
                 {% csrf_token %}
+
+                <!-- Instrument Section -->
+                <div class="form-group">
+                    <select id="id_instrument" name="instrument" class="form-control" required>
+                        {% for instrument in Instruments %}
+                        <option value="{{ instrument.pk }}" {% if instrument.pk == tutorial.instrument.pk %}selected{% endif %}>
+                            {{ instrument.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <label for="id_instrument" class="floating-label">Instrument Name</label>
+                </div>
                 
                 <!-- Title Field -->
                 <div class="form-group floating-label-group">
@@ -41,17 +53,7 @@
                     <label for="id_description" class="floating-label">Description</label>
                 </div>
                 
-                <!-- Instrument Section -->
-                <div class="form-group">
-                    <select id="id_instrument" name="instrument" class="form-control" required>
-                        {% for instrument in Instruments %}
-                        <option value="{{ instrument.pk }}" {% if instrument.pk == feedback.instrument.pk %}selected{% endif %}>
-                            {{ instrument.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <label for="id_instrument" class="floating-label">Instrument Name</label>
-                </div>
+
                 
                 <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary">Update Video</button>
