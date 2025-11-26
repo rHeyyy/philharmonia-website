@@ -45,7 +45,7 @@
                             <span class="detail-label">Status:</span>
                             <span class="detail-value">
                                 <button class="status-select status-{{ Performance.status|lower }} edit-performance-status" 
-                                        data-performance-id="{{ Performance.pk }}">
+                                        data-performance-id3="{{ Performance.pk }}">
                                     {{ Performance.status }}
                                 </button>
                             </span>
@@ -96,7 +96,7 @@
                             <td>{{ Performance.message }}</td>
                             <td>
                                 <button class="status-select status-{{ Performance.status|lower }} edit-performance-status" 
-                                        data-performance-id="{{ Performance.pk }}">
+                                        data-performance-id3="{{ Performance.pk }}">
                                     {{ Performance.status }}
                                 </button>
                             </td>
@@ -121,8 +121,8 @@
 </div>
 
 <!-- Status Modal -->
-<div id="Performance-Status-Modal" class="modal">
-    <div class="modal-content">
+<div id="Performance-Status-Modal" class="Performance-Status-Modal">
+    <div class="Performance-Status-modal-content">
         <span class="close-btn1">&times;</span>
         <div id="Performance-status-modal-form-container">
             <!-- Status form will be loaded here -->
@@ -318,7 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
     statusButtons.forEach((button) => {
         button.addEventListener("click", (e) => {
             e.preventDefault();
-            const performanceId = button.getAttribute("data-performance-id");
+            const performanceId = button.getAttribute("data-performance-id3");
 
             // Load the status form dynamically via fetch
             fetch(`/admin_Performance/status/${performanceId}/`)
@@ -463,7 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <span class="detail-label">Status:</span>
                             <span class="detail-value">
                                 <button class="status-select status-{{ Lesson.status|lower }} edit-Lesson-status" 
-                                        data-Lesson-id="{{ Lesson.pk }}">
+                                        data-Lesson-id3="{{ Lesson.pk }}">
                                     {{ Lesson.status }}
                                 </button>
                             </span>
@@ -514,7 +514,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <td>{{ Lesson.message }}</td>
                             <td>
                                 <button class="status-select status-{{ Lesson.status|lower }} edit-Lesson-status" 
-                                        data-Lesson-id="{{ Lesson.pk }}">
+                                        data-Lesson-id3="{{ Lesson.pk }}">
                                     {{ Lesson.status }}
                                 </button>
                             </td>
@@ -539,8 +539,8 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
 
 <!-- Status Modal -->
-<div id="Lesson-Status-Modal" class="modal-status">
-    <div class="modal-content">
+<div id="Lesson-Status-Modal" class="Lesson-Status-Modal">
+    <div class="Lesson-Status-modal-content">
         <span class="close-btn1">&times;</span>
         <div id="Lesson-status-modal-form-container">
             <!-- Status form will be loaded here -->
@@ -596,21 +596,6 @@ document.addEventListener("DOMContentLoaded", () => {
     max-width: 120px;
 }
 
-/* Modal styles */
-.modal-status {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-}
-
-.modal-status.show {
-    display: block;
-}
 
 </style>
     <!-- Modal Dialogs -->
@@ -752,7 +737,7 @@ document.addEventListener("DOMContentLoaded", () => {
     statusButtons.forEach((button) => {
         button.addEventListener("click", (e) => {
             e.preventDefault();
-            const LessonId = button.getAttribute("data-Lesson-id");
+            const LessonId = button.getAttribute("data-Lesson-id3");
 
             // Load the status form dynamically via fetch
             fetch(`/admin_Lesson/status/${LessonId}/`)
