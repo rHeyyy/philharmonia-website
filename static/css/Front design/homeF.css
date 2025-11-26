@@ -1246,7 +1246,6 @@ body::-webkit-scrollbar {
 /* INSTRUMENT WITH DETAILED CAROUSEL DESIGN *//* INSTRUMENT WITH DETAILED CAROUSEL DESIGN *//* INSTRUMENT WITH DETAILED CAROUSEL DESIGN */
 /* INSTRUMENT WITH DETAILED CAROUSEL DESIGN *//* INSTRUMENT WITH DETAILED CAROUSEL DESIGN *//* INSTRUMENT WITH DETAILED CAROUSEL DESIGN */
 /* Category tabs styling */
-
 .ins-body1 {
   max-width: 1200px;
   margin: 0 auto;
@@ -1260,6 +1259,7 @@ body::-webkit-scrollbar {
   justify-content: space-between;
   margin-bottom: 2rem;
   gap: 1rem;
+  position: relative; /* Needed for arrows */
 }
 
 .category-tabs1 {
@@ -1274,7 +1274,7 @@ body::-webkit-scrollbar {
 .category-tabs1::after {
   content: '';
   position: absolute;
-  bottom: -10px;
+  bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
@@ -1581,7 +1581,7 @@ body::-webkit-scrollbar {
   position: absolute;
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent), var(--primary));
+  background: var(--primary);
   bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
@@ -1595,60 +1595,68 @@ body::-webkit-scrollbar {
   margin: 0 auto;
 }
 
-/* Responsive adjustments */
+/* === Responsive adjustments + arrows for mobile === */
 @media (max-width: 768px) {
   .instrument-card1 {
     width: 240px;
     height: 360px;
     margin-left: -120px;
   }
-  
-  .instrument-card1.left-1 {
-    transform: translateX(-140px) translateZ(-80px) rotateY(20deg) scale(0.9);
-  }
-  .instrument-card1.left-2 {
-    transform: translateX(-240px) translateZ(-120px) rotateY(30deg) scale(0.8);
-  }
-  .instrument-card1.left-3 {
-    transform: translateX(-320px) translateZ(-150px) rotateY(40deg) scale(0.7);
-  }
-  .instrument-card1.right-1 {
-    transform: translateX(140px) translateZ(-80px) rotateY(-20deg) scale(0.9);
-  }
-  .instrument-card1.right-2 {
-    transform: translateX(240px) translateZ(-120px) rotateY(-30deg) scale(0.8);
-  }
-  .instrument-card1.right-3 {
-    transform: translateX(320px) translateZ(-150px) rotateY(-40deg) scale(0.7);
-  }
-  
+
+  .instrument-card1.left-1 { transform: translateX(-140px) translateZ(-80px) rotateY(20deg) scale(0.9); }
+  .instrument-card1.left-2 { transform: translateX(-240px) translateZ(-120px) rotateY(30deg) scale(0.8); }
+  .instrument-card1.left-3 { transform: translateX(-320px) translateZ(-150px) rotateY(40deg) scale(0.7); }
+  .instrument-card1.right-1 { transform: translateX(140px) translateZ(-80px) rotateY(-20deg) scale(0.9); }
+  .instrument-card1.right-2 { transform: translateX(240px) translateZ(-120px) rotateY(-30deg) scale(0.8); }
+  .instrument-card1.right-3 { transform: translateX(320px) translateZ(-150px) rotateY(-40deg) scale(0.7); }
+
   .category-tabs1 {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
     gap: 0.5rem;
+    padding: 0 2rem;
   }
-  
+
+  .category-tabs1::-webkit-scrollbar { display: none; }
+
   .category-btn1 {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  .instruments-intro h2 {
-    font-size: 1.6rem;
-  }
-  
-  .intro-text {
-    font-size: 1rem;
+  /* Arrow buttons for tabs */
+  /* .tab-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0,0,0,0.6);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 18px;
   }
 
-  /* Adjust region badge for mobile */
-  .region-badge {
-    font-size: 10px;
-    padding: 3px 8px;
-  }
+  .tab-arrow-left { left: 5px; }
+  .tab-arrow-right { right: 5px; } */
 
-  /* Adjust province info for mobile */
-  .province-info {
-    font-size: 12px;
-  }
+  /* Text adjustments */
+  .instruments-intro h2 { font-size: 1.6rem; }
+  .intro-text { font-size: 1rem; }
+
+  /* Shrink badges and province info */
+  .region-badge { font-size: 10px; padding: 3px 8px; }
+  .province-info { font-size: 12px; }
 }
 
 /* INSTRUMENT WITH DETAILED CAROUSEL DESIGN *//* INSTRUMENT WITH DETAILED CAROUSEL DESIGN *//* INSTRUMENT WITH DETAILED CAROUSEL DESIGN */

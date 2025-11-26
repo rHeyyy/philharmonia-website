@@ -244,106 +244,118 @@
 </div>
 
 <script>
-    // create Site3DContentCard
+   // Site3DContent Modal Management
 document.addEventListener("DOMContentLoaded", () => {
-    const addSite3DContentmodal = document.getElementById("Create-Site3DContent-Modal");
-    const closeBtn = addSite3DContentmodal.querySelector(".close-btn3d");
-    const addSite3DContentmodalFormContainer = document.getElementById("Create-Site3DContent-modal-form-container");
-    const addSite3DContentLinks = document.querySelectorAll(".create-Site3DContent");
+    // Cache modal elements and implement shared functionality
+    const modals = {
+        create: {
+            element: document.getElementById("Create-Site3DContent-Modal"),
+            container: document.getElementById("Create-Site3DContent-modal-form-container"),
+            closeBtn: document.querySelector("#Create-Site3DContent-Modal .close-btn3d"),
+            cache: null,
+            url: () => "/admin_3dContent/create/"
+        },
+        edit: {
+            element: document.getElementById("Edit-Site3DContent-Modal"),
+            container: document.getElementById("Edit-Site3DContent-modal-form-container"),
+            closeBtn: document.querySelector("#Edit-Site3DContent-Modal .close-btn3d"),
+            cache: {},
+            url: (id) => `/admin_3dContent/${id}/edit/`
+        },
+        delete: {
+            element: document.getElementById("Delete-Site3DContent-Modal"),
+            container: document.getElementById("Delete-Site3DContent-modal-form-container"),
+            closeBtn: document.querySelector("#Delete-Site3DContent-Modal .close-btn3d"),
+            cache: {},
+            url: (id) => `/admin_3dContent/${id}/delete/`
+        }
+    };
 
-    // Handle clicking on the edit link
-    addSite3DContentLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-            e.preventDefault();
+    // Preload Create Modal content
+    fetch(modals.create.url())
+        .then(response => response.text())
+        .then(data => {
+            modals.create.cache = data;
+        })
+        .catch(error => console.error("Error preloading create modal:", error));
 
-            // Load the form dynamically via fetch
-            fetch(`/admin_3dContent/create/`)
-                .then((response) => response.text())
-                .then((data) => {
-                    addSite3DContentmodalFormContainer.innerHTML = data;
-                    addSite3DContentmodal.classList.add("show"); // Show the modal
-                })
-                .catch((error) => {
-                    addSite3DContentmodalFormContainer.innerHTML = "<h2>Error loading form</h2>";
+    // Generic modal handler
+    function setupModal(modalConfig, triggerSelector, getIdFromTrigger) {
+        const triggers = document.querySelectorAll(triggerSelector);
+        
+        triggers.forEach(trigger => {
+            trigger.addEventListener("click", async (e) => {
+                e.preventDefault();
+                const id = getIdFromTrigger(trigger);
+                
+                // Show loading state
+                modalConfig.container.innerHTML = '<div class="loading-spinner"></div>';
+                modalConfig.element.classList.add("show");
+                
+                // Check cache first
+                const cacheKey = id || 'create';
+                if (modalConfig.cache && (id ? modalConfig.cache[id] : modalConfig.cache)) {
+                    modalConfig.container.innerHTML = id ? modalConfig.cache[id] : modalConfig.cache;
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(modalConfig.url(id));
+                    const html = await response.text();
+                    modalConfig.container.innerHTML = html;
+                    
+                    // Cache the response
+                    if (id) {
+                        modalConfig.cache[id] = html;
+                    } else {
+                        modalConfig.cache = html;
+                    }
+                } catch (error) {
+                    modalConfig.container.innerHTML = "<h2>Error loading form</h2>";
                     console.error("Error:", error);
-                });
+                }
+            });
         });
-    });
+        
+        // Close modal handler
+        if (modalConfig.closeBtn) {
+            modalConfig.closeBtn.addEventListener("click", () => {
+                modalConfig.element.classList.remove("show");
+            });
+        }
+    }
 
-    // Close modal using the close button
-    closeBtn.addEventListener("click", () => {
-        addSite3DContentmodal.classList.remove("show"); // Close the modal
+    // Initialize all modals
+    setupModal(
+        modals.create,
+        ".create-Site3DContent",
+        () => null // No ID needed for create
+    );
+    
+    setupModal(
+        modals.edit,
+        ".edit-Site3DContent",
+        (trigger) => trigger.getAttribute("data-Site3DContent-id")
+    );
+    
+    setupModal(
+        modals.delete,
+        ".delete-Site3DContent",
+        (trigger) => trigger.getAttribute("data-Site3DContent-id2")
+    );
+
+    
+    // Close modals when clicking outside
+    window.addEventListener("click", (e) => {
+        if (e.target.classList.contains("Create-Site3DContent-Modal") || 
+            e.target.classList.contains("Edit-Site3DContent-Modal") || 
+            e.target.classList.contains("Delete-Site3DContent-Modal")) {
+            e.target.classList.remove("show");
+        }
     });
 });
 
-// Delete Instrument
-document.addEventListener("DOMContentLoaded", () => {
-    const delSite3DContentmodal = document.getElementById("Delete-Site3DContent-Modal");
-    const closeBtn = delSite3DContentmodal.querySelector(".close-btn3d");
-    const delSite3DContentmodalFormContainer = document.getElementById("Delete-Site3DContent-modal-form-container");
-    const delSite3DContentLinks = document.querySelectorAll(".delete-Site3DContent");
-
-    // Handle clicking on the edit link
-    delSite3DContentLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-            e.preventDefault();
-            const Site3DContentId = link.getAttribute("data-Site3DContent-id2");
-
-            // Load the form dynamically via fetch
-            fetch(`/admin_3dContent/${Site3DContentId}/delete/`)
-                .then((response) => response.text())
-                .then((data) => {
-                    delSite3DContentmodalFormContainer.innerHTML = data;
-                    delSite3DContentmodal.classList.add("show"); // Show the modal
-                })
-                .catch((error) => {
-                    delSite3DContentmodalFormContainer.innerHTML = "<h2>Error loading form</h2>";
-                    console.error("Error:", error);
-                });
-        });
-    });
-
-    // Close modal using the close button
-    closeBtn.addEventListener("click", () => {
-        delSite3DContentmodal.classList.remove("show"); // Close the modal
-    });
-});
-
-
-
-// Update Site3DContent
-document.addEventListener("DOMContentLoaded", () => {
-    const updateSite3DContentmodal = document.getElementById("Edit-Site3DContent-Modal");
-    const closeBtn = updateSite3DContentmodal.querySelector(".close-btn3d");
-    const Site3DContentmodalFormContainer = document.getElementById("Edit-Site3DContent-modal-form-container");
-    const editSite3DContentLinks = document.querySelectorAll(".edit-Site3DContent");
-
-    // Handle clicking on the edit link
-    editSite3DContentLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-            e.preventDefault();
-            const Site3DContentId = link.getAttribute("data-Site3DContent-id");
-
-            // Load the form dynamically via fetch
-            fetch(`/admin_3dContent/${Site3DContentId}/edit/`)
-                .then((response) => response.text())
-                .then((data) => {
-                    Site3DContentmodalFormContainer.innerHTML = data;
-                    updateSite3DContentmodal.classList.add("show"); // Show the modal
-                })
-                .catch((error) => {
-                    Site3DContentmodalFormContainer.innerHTML = "<h2>Error loading form</h2>";
-                    console.error("Error:", error);
-                });
-        });
-    });
-
-    // Close modal using the close button
-    closeBtn.addEventListener("click", () => {
-        updateSite3DContentmodal.classList.remove("show"); // Close the modal
-    });
-});
-
+// Site3DContent Search Functionality
 document.addEventListener("DOMContentLoaded", () => {
     const searchInputSite3DContent = document.querySelector(".Site3DContent"); // Input field
     const Site3DContentTableRows = document.querySelectorAll(".Site3DContent1 tr"); // Desktop table rows

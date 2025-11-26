@@ -1017,6 +1017,98 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.getElementById('relatedCarousel');
+            const indicatorsContainer = document.getElementById('carouselIndicators');
+            
+            // Only add swipe functionality and indicators on mobile
+            if (window.innerWidth <= 768) {
+                // Calculate number of slides for indicators
+                const cardCount = carousel.children.length;
+                const slidesCount = Math.ceil(cardCount / 2); // 2 cards per slide on mobile
+                
+                // Create indicators
+                for (let i = 0; i < slidesCount; i++) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'indicator';
+                    if (i === 0) indicator.classList.add('active');
+                    indicatorsContainer.appendChild(indicator);
+                }
+                
+                // Swipe functionality
+                let startX = 0;
+                let currentX = 0;
+                let isDragging = false;
+                
+                carousel.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                });
+                
+                carousel.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    currentX = e.touches[0].clientX;
+                });
+                
+                carousel.addEventListener('touchend', () => {
+                    if (!isDragging) return;
+                    
+                    const diff = startX - currentX;
+                    const threshold = 50; // Minimum swipe distance
+                    
+                    if (Math.abs(diff) > threshold) {
+                        if (diff > 0) {
+                            // Swiped left - next slide
+                            scrollToNextSlide();
+                        } else {
+                            // Swiped right - previous slide
+                            scrollToPrevSlide();
+                        }
+                    }
+                    
+                    isDragging = false;
+                });
+                
+                // Update indicators on scroll
+                carousel.addEventListener('scroll', updateIndicators);
+                
+                function scrollToNextSlide() {
+                    const scrollAmount = carousel.offsetWidth * 0.5; // 50% of container width (2 cards)
+                    carousel.scrollBy({
+                        left: scrollAmount,
+                        behavior: 'smooth'
+                    });
+                }
+                
+                function scrollToPrevSlide() {
+                    const scrollAmount = carousel.offsetWidth * 0.5; // 50% of container width (2 cards)
+                    carousel.scrollBy({
+                        left: -scrollAmount,
+                        behavior: 'smooth'
+                    });
+                }
+                
+                function updateIndicators() {
+                    const scrollPosition = carousel.scrollLeft;
+                    const slideWidth = carousel.offsetWidth * 0.5; // 2 cards per view
+                    const currentSlide = Math.round(scrollPosition / slideWidth);
+                    
+                    // Update active indicator
+                    const indicators = document.querySelectorAll('.indicator');
+                    indicators.forEach((indicator, index) => {
+                        if (index === currentSlide) {
+                            indicator.classList.add('active');
+                        } else {
+                            indicator.classList.remove('active');
+                        }
+                    });
+                }
+            }
+        });
+
+
+
+
     // Sources Dropdown Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const sourcesDropdown = document.getElementById('sourcesDropdown');
@@ -1067,6 +1159,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
 <script src="{% static 'js/instrumentdetailed.js' %}"></script>
 </body>
 </html>

@@ -935,9 +935,16 @@ button:focus-visible {
         .related-detail-carousel {
             display: flex;
             gap: 20px;
-            overflow-x: auto;
             padding: 20px 0;
             margin: 0 -10px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        .related-detail-carousel::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
         }
         
         .related-detail-card {
@@ -946,6 +953,7 @@ button:focus-visible {
             overflow: hidden;
             box-shadow: var(--card-shadow);
             transition: all 0.3s;
+            cursor: pointer;
         }
         
         .related-detail-card:hover {
@@ -975,6 +983,64 @@ button:focus-visible {
             color: var(--text-light);
         }
         
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .related-detail-carousel {
+                display: grid;
+                grid-auto-flow: column;
+                grid-auto-columns: calc(50% - 10px);
+                gap: 20px;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+                padding: 20px 10px;
+                margin: 0;
+            }
+            
+            .related-detail-card {
+                flex: none;
+                scroll-snap-align: start;
+            }
+            
+            .related-detail-image {
+                height: 140px;
+            }
+            
+            .carousel-indicators {
+                display: flex;
+                justify-content: center;
+                margin-top: 15px;
+                gap: 8px;
+            }
+            
+            .indicator {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background-color: #ddd;
+                transition: background-color 0.3s;
+            }
+            
+            .indicator.active {
+                background-color: var(--primary);
+            }
+        }
+        
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .carousel-indicators {
+                display: none;
+            }
+        }
+        
+        /* No items message */
+        .no-items {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-style: italic;
+        }
         /* Fun Fact */
         .fun-detail-fact {
             background: var(--primary);
