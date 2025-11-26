@@ -2078,7 +2078,7 @@ class UpdatethreeD(LoginRequiredMixin, UpdateView):
     
 class DeletethreeD(LoginRequiredMixin, DeleteView):
     model = Instrument3DModel
-    template_name = 'app/admin/3D Model/Delete3d.html'
+    template_name = 'app/admin/3D Model/Delete3D.html'
     success_url = reverse_lazy('admin_main')
     context_object_name = "threeD"
 
@@ -2090,40 +2090,35 @@ def admin_3dContent(request):
         return redirect('user_home')
 
     sitecontent = Site3DContent.objects.all()
-    return render(request, 'app/admin/3d Content/admin_3dContent.html', {'sitecontent': sitecontent })
+    return render(request, 'app/admin/3D Content/admin_3dContent.html', {'sitecontent': sitecontent })
 
 
 class Create3dContent(LoginRequiredMixin, CreateView):
     model = Site3DContent
     fields = ['hero_title', 'hero_description', 'about_title', 'about_content', 'about_image'] 
-    template_name = 'app/admin/3d Content/Create3dContent.html'
+    template_name = 'app/admin/3D Content/Create3dContent.html'
     success_url = reverse_lazy('admin_main')
    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Pass the first object if it exists, otherwise None
-        context['sitecontent'] = Site3DContent.objects.first()
-        return context
-
     def form_valid(self, form):
         if form.is_valid():
             return super().form_valid(form)
-        return super().form_invalid(form)       
+        return super().form_invalid(form)
+    
+        
 
 class Update3dContent(LoginRequiredMixin, UpdateView):
     model = Site3DContent
     form_class = sitecontentForm
-    template_name = 'app/admin/3d Content/Update3dContent.html'
+    template_name = 'app/admin/3D Content/Update3dContent.html'
     success_url = reverse_lazy('admin_main')
     context_object_name = "sitecontent"
 
+   
 class Delete3dContent(LoginRequiredMixin, DeleteView):
     model = Site3DContent
-    template_name = 'app/admin/3d Content/Delete3dContent.html'
+    template_name = 'app/admin/3D Content/Delete3dContent.html'
     success_url = reverse_lazy('admin_main')
     context_object_name = "sitecontent"
-
-
 
 # INSTRUMENT LINKS
 @login_required
