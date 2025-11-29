@@ -31,6 +31,13 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # --------------------------
+# HTTPS / SSL SETTINGS (Fix Google OAuth redirect)
+# --------------------------
+if os.environ.get("RAILWAY_ENVIRONMENT"):  # Only in production
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# --------------------------
 # APPLICATION DEFINITION
 # --------------------------
 INSTALLED_APPS = [
@@ -146,8 +153,8 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-# Set SITE_ID to the production site ID (after adding the site in Django Admin)
-SITE_ID = 2  # Change to the actual ID of philharmonia-website-production.up.railway.app
+# Set SITE_ID to the production site ID
+SITE_ID = 2  # Change if your production site has a different ID
 
 LOGIN_REDIRECT_URL = "/user_home/"
 LOGOUT_REDIRECT_URL = "/"
