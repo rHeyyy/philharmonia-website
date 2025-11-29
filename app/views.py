@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 # FROM FORMS.PY
-from .forms import UserRegisterForm, UserLoginForm, CustomUserForm, InstrumentForm, CategoryForm, RegionForm, MaterialForm, StepForm ,FeedbackForm, TestimonialForm ,TutorialForm, TechniqueForm ,InsMaterialForm, InstructorForm, PrincipleForm, PrincipleCardForm, SoundForm, ContactPageForm, OfferingForm, ImportanceForm, AudienceForm, MemberForm, LinkForm, ViewForm, SignificanceForm, FunFactForm, SocialMediaForm, FootersForm, HomePageForm, TaglineForm, PageForm, SectionForm, PerformanceForm, LessonForm, threeDForm, sitecontentForm, InsLinkForm, UserPerformanceForm, UserLessonForm
+from .forms import UserRegisterForm, UserLoginForm, CustomUserForm, InstrumentForm, CategoryForm, RegionForm, MaterialForm, StepForm ,FeedbackForm, TestimonialForm ,TutorialForm, TechniqueForm ,InsMaterialForm, InstructorForm, PrincipleForm, PrincipleCardForm, SoundForm, ContactPageForm, OfferingForm, ImportanceForm, AudienceForm, MemberForm, LinkForm, ViewForm, SignificanceForm, FunFactForm, SocialMediaForm, FootersForm, HomePageForm, TaglineForm, PageForm, SectionForm, PerformanceForm, LessonForm, threeDForm, sitecontentForm, InsLinkForm, UserPerformanceForm, UserLessonForm, PerformanceAppointmentForm, LessonAppointmentForm
 
 # FROM MODELS.PY
 from .models import CustomUser, InstrumentCategory, Region, Material, InstrumentMaterial ,Instrument, Sound ,Feedback, Testimonial, UserLogin, VideoTutorial,GuidingPrinciples, PrincipleCard ,DiscoverSection, ContactPage, ContactMessage, Offering, CulturalImportance, TargetAudience, TeamMember, SocialLink, TechniqueStep, ConstructionStep, InstrumentImage, CulturalSignificance, Funfact, HomePage, Tagline, FooterSettings, SocialMediaLink, InstrumentPage, PageSection, PerformanceAppointment, LessonAppointment, InstrumentForum, InstrumentMessage, Instrument3DModel, Site3DContent, InstrumentLink
@@ -2240,52 +2240,115 @@ def user_main(request):
         'Lesson' : Lesson
     })
 
-#APPOINTMENT
-
-class Appointment(LoginRequiredMixin, CreateView):
-    model = PerformanceAppointment
-    fields = ['event_name', 'event_type', 'event_location', 'event_date', 'event_time', 'message']  # Removed 'user' from fields
+class AppointmentView(LoginRequiredMixin, CreateView):
     template_name = 'app/user/appointment/Appointment.html'
-    success_url = reverse_lazy('admin_main')
-   
-    def form_valid(self, form):
-        form.instance.user = self.request.user  # Automatically set the logged-in user
-        return super().form_valid(form)
-    
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # You can set initial values here if needed
-        return form
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # You might not need all users anymore, but keeping if needed elsewhere
-        context['Users'] = CustomUser.objects.all()
-        context['current_user'] = self.request.user
-        return context
 
-class Appointment(LoginRequiredMixin, CreateView):
-    model = LessonAppointment
-    fields = ['school_name', 'class_size', 'lesson_date', 'lesson_time', 'location' , 'message']  # Removed 'user' from fields
-    template_name = 'app/user/appointment/Appointment.html'
-    success_url = reverse_lazy('admin_main')
-   
+    def get_form_class(self):
+        if self.request.method == 'POST':
+            if 'event_name' in self.request.POST:
+                return PerformanceAppointmentForm
+            elif 'school_name' in self.request.POST:
+                return LessonAppointmentForm
+        return PerformanceAppointmentForm
+
+    def get_model(self):
+        form_class = self.get_form_class()
+        return PerformanceAppointment if form_class == PerformanceAppointmentForm else LessonAppointment
+
     def form_valid(self, form):
-        form.instance.user = self.request.user  # Automatically set the logged-in user
+        form.instance.user = self.request.user
+        appointment = form.save()
+        
+        # Return JSON for AJAX
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True, 
+                'message': ''
+            })
+        
+        # For non-AJAX, you might want to handle differently
+        messages.success(self.request, 'Appointment submitted successfully!')
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Return JSON for AJAX errors
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            errors = {field: [str(e) for e in error] for field, error in form.errors.items()}
+            return JsonResponse({
+                'success': False, 
+                'errors': errors
+            }, status=400)
+        
+        # Show validation errors in normal POST
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_url(self):
+        # This won't be used for AJAX requests
+        return reverse('user_home')
     
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        # You can set initial values here if needed
-        return form
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # You might not need all users anymore, but keeping if needed elsewhere
-        context['Users'] = CustomUser.objects.all()
-        context['current_user'] = self.request.user
-        return context
-    
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+
+@require_POST
+@csrf_exempt
+def check_date_availability(request):
+    """API endpoint to check if a date is already booked"""
+    try:
+        data = json.loads(request.body)
+        date_str = data.get('date')
+        appointment_type = data.get('appointment_type', 'performance')
+        
+        if not date_str:
+            return JsonResponse({'available': True})  # Default to available if no date provided
+        
+        from datetime import datetime
+        from django.utils import timezone
+        check_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        
+        # Check for existing appointments on the same date
+        existing_performance = False
+        existing_lesson = False
+        
+        if appointment_type == 'performance':
+            # For performance form, check both performance and lesson appointments
+            existing_performance = PerformanceAppointment.objects.filter(
+                event_date=check_date,
+                status='Accepted'
+            ).exists()
+            
+            existing_lesson = LessonAppointment.objects.filter(
+                lesson_date=check_date,
+                status='Accepted'
+            ).exists()
+        else:
+            # For lesson form, check both performance and lesson appointments
+            existing_performance = PerformanceAppointment.objects.filter(
+                event_date=check_date,
+                status='Accepted'
+            ).exists()
+            
+            existing_lesson = LessonAppointment.objects.filter(
+                lesson_date=check_date,
+                status='Accepted'
+            ).exists()
+        
+        if existing_performance:
+            return JsonResponse({
+                'available': False,
+                'message': f"We already have an accepted performance appointment on {check_date}. Please choose a different date."
+            })
+        
+        if existing_lesson:
+            return JsonResponse({
+                'available': False,
+                'message': f"We already have an accepted lesson appointment on {check_date}. Please choose a different date."
+            })
+        
+        return JsonResponse({'available': True})
+        
+    except Exception as e:
+        print(f"Error checking date availability: {e}")
+        return JsonResponse({'available': True})  # Default to available on error
 
 # Update user profile (including photo)
 @login_required

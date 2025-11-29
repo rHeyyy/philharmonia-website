@@ -37,7 +37,7 @@ from .views import (user_main, AboutPageView, Models3d ,ContactPageView ,VideoTu
                     admin_HomePage, CreateHomePage, UpdateHomePage, DeleteHomePage,
                     CreateTagline, UpdateTagline, DeleteTagline,
                     admin_performance, CreatePerformance, UpdatePerformance, DeletePerformance,
-                    CreateLesson, UpdateLesson, DeleteLesson, Appointment,
+                    CreateLesson, UpdateLesson, DeleteLesson, AppointmentView,
                     admin_threeD, CreatethreeD, UpdatethreeD, DeletethreeD,
                     admin_3dContent, Create3dContent, Update3dContent, Delete3dContent,
                     admin_InsLink, CreateInsLink, UpdateInsLink, DeleteInsLink,
@@ -283,7 +283,8 @@ urlpatterns = [
     path('admin_Performance/status/<int:pk>/', views.performance_Status, name='performance_Status'),
     path('admin_Performance/<int:pk>/delete/', DeletePerformance.as_view(), name='DeletePerformance'),
 
-    path('Appointment/create/', Appointment.as_view(), name='Appointment'),
+    path('Appointment/create/', AppointmentView.as_view(), name='Appointment'),
+    path('api/check-date-availability/', views.check_date_availability, name='check_date_availability'),
     # Lesson
     path('admin_Lesson/create/', CreateLesson.as_view(), name='CreateLesson'),
     path('admin_Lesson/<int:pk>/edit/', UpdateLesson.as_view(), name='UpdateLesson'),

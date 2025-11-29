@@ -264,10 +264,11 @@
 </style>
 <div class="front">
     <!-- Video with poster -->
-    <video class="bg-video" autoplay muted loop id="bgVideo" poster="{% static 'images/contact.JPG' %}">
-      <source src="{{ MEDIA_URL }}videos/front.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
+      <video class="bg-video" autoplay muted loop id="bgVideo"
+            poster="{% static 'images/contact.JPG' %}">
+          <source src="{{ MEDIA_URL }}images/videos/front.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
 
   
     <!-- Overlay with enhanced cultural and educational tone -->

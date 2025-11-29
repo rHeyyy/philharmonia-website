@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # --------------------------
 SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-for-dev")
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -122,14 +122,14 @@ USE_I18N = True
 USE_TZ = True
 
 # --------------------------
-# STATIC FILES (Local)
+# STATIC FILES
 # --------------------------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # --------------------------
-# MEDIA FILES (Local)
+# MEDIA FILES
 # --------------------------
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "images"
@@ -146,7 +146,9 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-SITE_ID = 1
+# Set SITE_ID to the production site ID (after adding the site in Django Admin)
+SITE_ID = 2  # Change to the actual ID of philharmonia-website-production.up.railway.app
+
 LOGIN_REDIRECT_URL = "/user_home/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
@@ -182,31 +184,23 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # --------------------------
-# CLOUDFLARE R2 STORAGE
+# CLOUDFLARE R2 STORAGE (Production)
 # --------------------------
 R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID")
 R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
 R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
 R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "philharmonia-media")
 
-# Only use Cloudflare R2 on Railway
 if os.environ.get("RAILWAY_ENVIRONMENT"):
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
     AWS_ACCESS_KEY_ID = R2_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY = R2_SECRET_ACCESS_KEY
     AWS_STORAGE_BUCKET_NAME = R2_BUCKET_NAME
-
     AWS_S3_ENDPOINT_URL = "https://0b418dde0bb4950435f6df4b43427951.r2.cloudflarestorage.com"
     AWS_S3_REGION_NAME = "auto"
-
     AWS_S3_CUSTOM_DOMAIN = "pub-a8c070b615064b4391ac33a8916b8b24.r2.dev"
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
-
-    AWS_S3_OBJECT_PARAMETERS = {
-        "CacheControl": "max-age=86400",
-    }
-
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
     AWS_DEFAULT_ACL = "public-read"
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = False

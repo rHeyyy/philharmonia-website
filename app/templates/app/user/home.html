@@ -378,19 +378,440 @@ document.addEventListener("DOMContentLoaded", () => {
   const addPerformancemodalFormContainer = document.getElementById("Create-Performances-modal-form-container");
   const addPerformanceLinks = document.querySelectorAll(".create-Performance");
 
+  // Function to check if date is already booked
+  async function checkDateAvailability(date, appointmentType) {
+    try {
+      const response = await fetch('/api/check-date-availability/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({
+          date: date,
+          appointment_type: appointmentType
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error checking date availability:', error);
+      return { available: true }; // Default to available if check fails
+    }
+  }
+
+  // Function to get CSRF token
+  function getCSRFToken() {
+    const cookieValue = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      ?.split('=')[1];
+    return cookieValue;
+  }
+
+  // Function to initialize appointment form handlers
+  function initializeAppointmentForm() {
+    console.log("Initializing appointment form handlers...");
+    
+    // ---- Tabs Animation ----
+    const tabInputs = document.querySelectorAll('input[name="appoint-tab"]');
+    tabInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        const activeForm = document.querySelector('.appoint-form-section[style*="display: block"]');
+        if (activeForm) {
+          activeForm.style.animation = 'none';
+          setTimeout(() => activeForm.style.animation = 'fadeIn 0.4s ease forwards', 10);
+        }
+      });
+    });
+
+    // ---- Error Message Functions ----
+    function showError(element, message, isSuccess = false, isDateConflict = false) {
+      if (!element) return;
+      
+      // Clear existing classes
+      element.classList.remove('success-message', 'date-conflict-message');
+      
+      // Add appropriate classes based on message type
+      if (isSuccess) {
+        element.classList.add('success-message');
+      } else if (isDateConflict) {
+        element.classList.add('date-conflict-message');
+      }
+      
+      element.innerHTML = message;
+      element.classList.add('show');
+      
+      // For success messages, don't auto-hide
+      if (!isSuccess) {
+        setTimeout(() => {
+          element.classList.remove('show');
+          setTimeout(() => element.innerHTML = '', 300);
+        }, 5000);
+      }
+    }
+
+    function clearError(element) {
+      if (!element) return;
+      element.classList.remove('show', 'success-message', 'date-conflict-message');
+      setTimeout(() => element.innerHTML = '', 300);
+    }
+
+    function markFieldAsError(field, hasError, isDateConflict = false) {
+      if (!field) return;
+      
+      // Remove existing error classes
+      field.classList.remove('error', 'date-conflict-error');
+      
+      if (hasError) {
+        field.classList.add('error');
+        if (isDateConflict) {
+          field.classList.add('date-conflict-error');
+        }
+      }
+    }
+
+    // ---- Date Validation Functions ----
+    async function validateDate(dateInput, timeInput = null, appointmentType = 'performance') {
+      if (!dateInput) return { isValid: false, errorMessage: "Date field not found", isDateConflict: false };
+      
+      const selectedDate = new Date(dateInput.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time part for date-only comparison
+      
+      let isValid = true;
+      let errorMessage = '';
+      let isDateConflict = false;
+
+      // Basic date validation
+      if (!dateInput.value) {
+        isValid = false;
+        errorMessage = "Please select a date.";
+      } else if (selectedDate < today) {
+        isValid = false;
+        errorMessage = "Cannot book appointments for past dates.";
+      }
+      
+      // If time is provided, validate datetime combination
+      if (isValid && timeInput && timeInput.value) {
+        const selectedDateTime = new Date(dateInput.value + 'T' + timeInput.value);
+        const now = new Date();
+        
+        if (selectedDateTime < now) {
+          isValid = false;
+          errorMessage = "Cannot book appointments for past date and time.";
+        }
+      }
+
+      // Check date availability if date is valid
+      if (isValid && dateInput.value) {
+        try {
+          const availability = await checkDateAvailability(dateInput.value, appointmentType);
+          if (!availability.available) {
+            isValid = false;
+            isDateConflict = true;
+            errorMessage = availability.message || `We already have an accepted appointment on ${dateInput.value}. Please choose a different date.`;
+          }
+        } catch (error) {
+          console.error('Error validating date availability:', error);
+          // Continue with submission if availability check fails
+        }
+      }
+
+      return { isValid, errorMessage, isDateConflict };
+    }
+
+    function setupDateValidation(dateField, timeField, errorContainer, appointmentType = 'performance') {
+      if (!dateField) return;
+      
+      // Debounce function to prevent too many API calls
+      let debounceTimer;
+      dateField.addEventListener('change', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+          const validation = await validateDate(dateField, timeField, appointmentType);
+          markFieldAsError(dateField, !validation.isValid, validation.isDateConflict);
+          
+          if (!validation.isValid) {
+            showError(errorContainer, validation.errorMessage, false, validation.isDateConflict);
+          } else {
+            clearError(errorContainer);
+            markFieldAsError(dateField, false);
+          }
+        }, 500); // 500ms debounce
+      });
+
+      // Also validate when time changes (if time field exists)
+      if (timeField) {
+        timeField.addEventListener('change', async function() {
+          const validation = await validateDate(dateField, timeField, appointmentType);
+          markFieldAsError(dateField, !validation.isValid, validation.isDateConflict);
+          markFieldAsError(timeField, !validation.isValid, validation.isDateConflict);
+          
+          if (!validation.isValid) {
+            showError(errorContainer, validation.errorMessage, false, validation.isDateConflict);
+          } else {
+            clearError(errorContainer);
+            markFieldAsError(dateField, false);
+            markFieldAsError(timeField, false);
+          }
+        });
+      }
+    }
+
+    // ---- Form Validation Before Submission ----
+    async function validateFormBeforeSubmit(form, dateField, timeField, errorContainer, appointmentType = 'performance') {
+      const validation = await validateDate(dateField, timeField, appointmentType);
+      
+      if (!validation.isValid) {
+        showError(errorContainer, validation.errorMessage, false, validation.isDateConflict);
+        markFieldAsError(dateField, true, validation.isDateConflict);
+        if (timeField) markFieldAsError(timeField, true, validation.isDateConflict);
+        dateField.focus();
+        return false;
+      }
+      
+      return true;
+    }
+
+    // ---- AJAX Form Handler ----
+    function handleFormAjax(formId, dateFieldId, timeFieldId, errorElementId, appointmentType = 'performance') {
+      const form = document.getElementById(formId);
+      const dateField = document.getElementById(dateFieldId);
+      const timeField = timeFieldId ? document.getElementById(timeFieldId) : null;
+      const errorElement = document.getElementById(errorElementId);
+
+      if (!form || !dateField) {
+        console.error(`Form elements not found for ${formId}`);
+        return;
+      }
+
+      // Setup real-time date validation
+      setupDateValidation(dateField, timeField, errorElement, appointmentType);
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log("Form submission intercepted for:", formId);
+        
+        // Clear previous errors
+        clearError(errorElement);
+        markFieldAsError(dateField, false);
+        if (timeField) markFieldAsError(timeField, false);
+
+        // Validate date before submission (including availability check)
+        const isValid = await validateFormBeforeSubmit(form, dateField, timeField, errorElement, appointmentType);
+        if (!isValid) {
+          return;
+        }
+
+        const formData = new FormData(form);
+
+        // Show loading state
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = 'Submitting...';
+        submitButton.disabled = true;
+
+        fetch(form.getAttribute('action'), {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': getCSRFToken()
+          },
+          credentials: 'same-origin'
+        })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log("Response received:", data);
+          
+          // Restore button state
+          submitButton.innerHTML = originalText;
+          submitButton.disabled = false;
+          
+          if (data.success) {
+            // Clear form
+            form.reset();
+            markFieldAsError(dateField, false);
+            if (timeField) markFieldAsError(timeField, false);
+            
+            // Show success message with countdown
+            let countdown = 5; // 5 seconds countdown
+            const successMessage = data.message || "Appointment submitted successfully! Please wait for our response.";
+            
+            // Show initial success message
+            showError(errorElement, `${successMessage}<br><small>Page will refresh in ${countdown} seconds...</small>`, true);
+            
+            // Disable form inputs during countdown
+            const formInputs = form.querySelectorAll('input, textarea, button');
+            formInputs.forEach(input => {
+              input.disabled = true;
+            });
+            
+            // Update countdown every second
+            const countdownInterval = setInterval(() => {
+              countdown--;
+              if (countdown > 0) {
+                showError(errorElement, `${successMessage}<br><small>Page will refresh in ${countdown} seconds...</small>`, true);
+              } else {
+                clearInterval(countdownInterval);
+                
+                // Add smooth fade-out transition to modal
+                addPerformancemodal.style.transition = 'opacity 0.5s ease';
+                addPerformancemodal.style.opacity = '0';
+                
+                // Wait for fade-out transition to complete, then refresh
+                setTimeout(() => {
+                  addPerformancemodalFormContainer.innerHTML = "";
+                  window.location.reload(); // Refresh the page
+                }, 500); // Wait for fade-out transition
+              }
+            }, 1000);
+            
+          } else if (data.errors) {
+            console.log("Form validation errors:", data.errors);
+            
+            let messages = [];
+            let hasDateError = false;
+            let hasDateConflict = false;
+            
+            for (const [field, errs] of Object.entries(data.errors)) {
+              console.log(`Error field: ${field}, errors:`, errs);
+              
+              // Show field-specific errors with better formatting
+              if (field === 'event_date' || field === 'lesson_date') {
+                const errorText = errs.join(', ');
+                messages.push(errorText);
+                markFieldAsError(dateField, true);
+                hasDateError = true;
+                
+                // Check if this is a date conflict error
+                if (errorText.includes('already have an accepted')) {
+                  hasDateConflict = true;
+                }
+              } else if (field === '__all__') {
+                // Handle non-field errors
+                messages.push(errs.join(', '));
+              } else {
+                // Handle other field errors
+                const fieldName = field.replace(/_/g, ' ');
+                messages.push(`<strong>${fieldName}:</strong> ${errs.join(', ')}`);
+              }
+            }
+            
+            // Show all error messages with appropriate styling
+            if (messages.length > 0) {
+              showError(errorElement, messages.join('<br>'), false, hasDateConflict);
+            } else {
+              showError(errorElement, "Please correct the errors below.");
+            }
+            
+            // If there's a date error, focus on the date field
+            if (hasDateError) {
+              dateField.focus();
+            }
+          }
+        })
+        .catch(err => {
+          console.error('Fetch error:', err);
+          // Restore button state on error
+          submitButton.innerHTML = originalText;
+          submitButton.disabled = false;
+          showError(errorElement, "Something went wrong. Please try again.");
+        });
+      });
+    }
+
+    // ---- Cancel Button Handler ----
+    const cancelButtons = document.querySelectorAll('.appoint-cancel-btn');
+    cancelButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Clear forms and errors
+        document.querySelectorAll('form').forEach(form => form.reset());
+        document.querySelectorAll('.FrontLerror-message').forEach(error => {
+          clearError(error);
+        });
+        document.querySelectorAll('.appoint-form-control.error, .appoint-form-control.date-conflict-error').forEach(field => {
+          field.classList.remove('error', 'date-conflict-error');
+        });
+        // Close modal
+        addPerformancemodal.classList.remove("show");
+        addPerformancemodalFormContainer.innerHTML = "";
+      });
+    });
+
+    // ---- Initialize Form Handlers ----
+    // Performance Form
+    handleFormAjax(
+      'performanceForm', 
+      'appoint_event_date_css', 
+      'appoint_event_time_css', 
+      'performanceFormError',
+      'performance'
+    );
+
+    // Lesson Form
+    handleFormAjax(
+      'lessonForm', 
+      'appoint_lesson_date_css', 
+      'appoint_lesson_time_css', 
+      'lessonFormError',
+      'lesson'
+    );
+
+    // ---- Set minimum date to today for all date inputs ----
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+      input.setAttribute('min', today);
+    });
+
+    console.log("Appointment form handlers initialized successfully");
+  }
+
   // Fetch + show modal when clicking create links
   addPerformanceLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
+      // Reset modal opacity when opening
+      addPerformancemodal.style.opacity = '1';
+      addPerformancemodal.style.transition = '';
+      
       fetch(`/Appointment/create/`)
-        .then((response) => response.text())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.text();
+        })
         .then((data) => {
           addPerformancemodalFormContainer.innerHTML = data;
           addPerformancemodal.classList.add("show");
+          
+          // Initialize the form handlers AFTER the content is loaded
+          setTimeout(() => {
+            initializeAppointmentForm();
+          }, 100);
         })
         .catch((error) => {
-          addPerformancemodalFormContainer.innerHTML = "<h2>Error loading form</h2>";
-          console.error("Error:", error);
+          console.error("Error loading form:", error);
+          addPerformancemodalFormContainer.innerHTML = `
+            <div class="error-message">
+              <h2>Error loading form</h2>
+              <p>Please try again later.</p>
+            </div>
+          `;
         });
     });
   });
@@ -398,56 +819,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Close modal with the 'x' button
   closeBtn.addEventListener("click", () => {
     addPerformancemodal.classList.remove("show");
-    // optionally clear form html to avoid stale elements
     addPerformancemodalFormContainer.innerHTML = "";
   });
 
-  // EVENT DELEGATION: handle clicks inside the dynamic form container
-  // This will catch Cancel button clicks even if form is loaded after DOMContentLoaded.
-  addPerformancemodalFormContainer.addEventListener("click", function(e) {
-    const cancel = e.target.closest(".appoint-cancel-btn");
-    if (cancel) {
+  // Close modal when clicking outside
+  addPerformancemodal.addEventListener("click", (e) => {
+    if (e.target === addPerformancemodal) {
       addPerformancemodal.classList.remove("show");
-      addPerformancemodalFormContainer.innerHTML = ""; // optional: clear injected html
-      return;
-    }
-
-    // If you want to also allow other future delegated controls, handle them here.
-  });
-
-  // Existing animations: tab animations & submit button success
-  // Note: skip adding success animation for cancel buttons
-  const tabInputs = document.querySelectorAll('input[name="appoint-tab"]');
-  tabInputs.forEach(input => {
-    input.addEventListener('change', function() {
-      const activeForm = document.querySelector('.appoint-form-section[style*="display: block"]');
-      if (activeForm) {
-        activeForm.style.animation = 'none';
-        setTimeout(() => {
-          activeForm.style.animation = 'fadeIn 0.4s ease forwards';
-        }, 10);
-      }
-    });
-  });
-
-  // Add success animation to submit buttons, but skip cancel buttons
-  // We listen on the modal container because buttons are dynamic
-  addPerformancemodalFormContainer.addEventListener('click', function(e) {
-    const btn = e.target.closest('.appoint-btn-primary');
-    if (!btn) return;
-
-    // Skip cancel buttons
-    if (btn.classList.contains('appoint-cancel-btn')) return;
-
-    // If it's inside a form, check validity and animate
-    const form = btn.closest('form');
-    if (form && form.checkValidity()) {
-      btn.classList.add('success');
-      setTimeout(() => btn.classList.remove('success'), 800);
+      addPerformancemodalFormContainer.innerHTML = "";
     }
   });
 
-  // Extra UI: Explore button scroll (unchanged)
+  // Extra UI: Explore button scroll
   const exploreBtn = document.getElementById('exploreBtn');
   if (exploreBtn) {
     exploreBtn.addEventListener('click', function () {
@@ -1110,7 +1493,7 @@ function updateViewButtonState(button, type, isPlaying) {
 
 <div class="text-end">
     <a href="javascript:void(0);" class="create-Testimonial testimonial-btn" id="create-service-btn">
-        <span>💬 Share Your Feedback</span>
+        <span>Testimonials </span>
     </a>
 </div>
 

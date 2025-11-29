@@ -362,7 +362,102 @@
   .appoint-instructions p, .appoint-instructions li { font-size: 11px; margin-bottom: 8px; }
   .appoint-instruction-image { height: 80px; margin-top: 10px; }
 }
+/* ================== Error Message Styles ================== */
+.FrontLerror-message {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 1px solid #f87171;
+  color: #dc2626;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 13px;
+  font-weight: 500;
+  display: none;
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+}
 
+.FrontLerror-message.show {
+  display: block;
+}
+
+.FrontLerror-message::before {
+  content: "⚠️ Cannot book appointments for past date and time.";
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================== Date Conflict Message Styles ================== */
+.FrontLerror-message.date-conflict-message {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #d97706;
+  color: #92400e;
+}
+
+.FrontLerror-message.date-conflict-message::before {
+  content: "⏰";
+  margin-right: 8px;
+  font-size: 14px;
+}
+/* Add error state for form controls */
+.appoint-form-control.error {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+.appoint-form-control.error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
+}
+
+/* ================== Smooth Modal Transitions ================== */
+#Create-Performances-Modal {
+  transition: opacity 0.5s ease;
+}
+
+/* ================== Success Message Styles ================== */
+.FrontLerror-message.success-message {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border: 1px solid #22c55e;
+  color: #166534;
+  transition: all 0.3s ease;
+}
+
+.FrontLerror-message.success-message::before {
+  content: "✅ Appointment submitted successfully! Please wait for our response.";
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.FrontLerror-message.success-message small {
+  opacity: 0.8;
+  font-size: 0.9em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* ================== Disabled Form State ================== */
+.appoint-form-control:disabled,
+.appoint-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.appoint-btn-primary:disabled:hover::before {
+  left: -100%;
+}
 /* Prevent horizontal scroll on body */
 html, body { max-width: 100%; overflow-x: hidden; }
 
@@ -384,7 +479,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
     <p>After submitting your appointment request, our team will review it and contact you to confirm the details.</p>
     
     <div class="appoint-instruction-image">
-      <!-- Replace with your actual image path -->
       <img src="{% static 'images/ghibli-style.jpg' %}" onerror="this.style.display='none'">
     </div>
   </div>
@@ -407,8 +501,11 @@ html, body { max-width: 100%; overflow-x: hidden; }
           <h2 class="appoint-form-title">Performance Appointment</h2>
           <p class="appoint-form-subtitle">Schedule your musical performance</p>
         </div>
-        
-        <form method="POST" enctype="multipart/form-data" action="{% url 'CreatePerformance' %}">
+
+        <!-- Error message container -->
+        <div id="performanceFormError" class="FrontLerror-message"></div>
+
+        <form id="performanceForm" method="POST" enctype="multipart/form-data" action="{% url 'Appointment' %}">
           {% csrf_token %}
           <div class="appoint-floating-label-group">
             <input class="appoint-form-control" type="text" id="appoint_event_name_css" name="event_name" placeholder=" " required>
@@ -451,8 +548,11 @@ html, body { max-width: 100%; overflow-x: hidden; }
           <h2 class="appoint-form-title">Lesson Appointment</h2>
           <p class="appoint-form-subtitle">Schedule your music lesson</p>
         </div>
-        
-        <form method="POST" enctype="multipart/form-data" action="{% url 'CreateLesson' %}">
+
+        <!-- Error message container -->
+        <div id="lessonFormError" class="FrontLerror-message"></div>
+
+        <form id="lessonForm" method="POST" enctype="multipart/form-data" action="{% url 'Appointment' %}">
           {% csrf_token %}
           <div class="appoint-floating-label-group">
             <input class="appoint-form-control" type="text" id="appoint_school_name_css" name="school_name" placeholder=" " required>
@@ -486,7 +586,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
           <button class="appoint-btn-primary" type="submit">Save Lesson</button>
           <button type="button" class="appoints-btn-cancel appoint-cancel-btn">Cancel</button>
-
         </form>
       </section>
     </div>

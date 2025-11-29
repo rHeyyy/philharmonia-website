@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import timezone
+from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate
 from .models import CustomUser, Instrument, InstrumentCategory, Region, Material, Feedback, VideoTutorial, TechniqueStep ,Testimonial, InstrumentMaterial, ConstructionStep ,DiscoverSection, GuidingPrinciples, PrincipleCard, Sound, ContactPage, ContactMessage, Offering, CulturalImportance, TargetAudience, TeamMember, SocialLink, InstrumentImage, CulturalSignificance, Funfact, Tagline, HomePage, SocialMediaLink, FooterSettings, InstrumentPage, PageSection, PerformanceAppointment, LessonAppointment, Instrument3DModel, Site3DContent, InstrumentLink
@@ -280,4 +282,116 @@ class UserLessonForm(forms.ModelForm):
     class Meta:
         model = LessonAppointment
         fields = ['school_name', 'class_size', 'lesson_date', 'lesson_time', 'location' , 'message']  
+
+
+
+
+
+
+
+
+
+# USER HOME PAGE VALIDATIONS
+class PerformanceAppointmentForm(forms.ModelForm):
+    class Meta:
+        model = PerformanceAppointment
+        fields = ['event_name', 'event_type', 'event_location', 'event_date', 'event_time', 'message']
+        widgets = {
+            'event_date': forms.DateInput(attrs={'type': 'date'}),
+            'event_time': forms.TimeInput(attrs={'type': 'time'}),
+            'message': forms.Textarea(attrs={'rows': 3}),
+        }
+    
+    def clean_event_date(self):
+        event_date = self.cleaned_data.get('event_date')
+        if event_date and event_date < timezone.now().date():
+            raise ValidationError("Cannot book appointments for past dates.")
+        return event_date
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        event_date = cleaned_data.get('event_date')
+        event_time = cleaned_data.get('event_time')
         
+        # Additional validation: if both date and time are provided, check if it's in the past
+        if event_date and event_time:
+            from datetime import datetime
+            event_datetime = datetime.combine(event_date, event_time)
+            current_naive = timezone.now().replace(tzinfo=None)
+            
+            if event_datetime < current_naive:
+                raise ValidationError("Cannot book appointments for past date and time.")
+        
+        # Check for existing appointments on the same date
+        if event_date:
+            # Check for existing performance appointments on the same date
+            existing_performance = PerformanceAppointment.objects.filter(
+                event_date=event_date,
+                status='Accepted'
+            ).exists()
+            
+            # Check for existing lesson appointments on the same date
+            existing_lesson = LessonAppointment.objects.filter(
+                lesson_date=event_date,
+                status='Accepted'
+            ).exists()
+            
+            if existing_performance:
+                self.add_error('event_date', f"We already have an accepted performance appointment on {event_date}. Please choose a different date.")
+            
+            if existing_lesson:
+                self.add_error('event_date', f"We already have an accepted lesson appointment on {event_date}. Please choose a different date.")
+        
+        return cleaned_data
+
+class LessonAppointmentForm(forms.ModelForm):
+    class Meta:
+        model = LessonAppointment
+        fields = ['school_name', 'class_size', 'lesson_date', 'lesson_time', 'location', 'message']
+        widgets = {
+            'lesson_date': forms.DateInput(attrs={'type': 'date'}),
+            'lesson_time': forms.TimeInput(attrs={'type': 'time'}),
+            'message': forms.Textarea(attrs={'rows': 3}),
+        }
+    
+    def clean_lesson_date(self):
+        lesson_date = self.cleaned_data.get('lesson_date')
+        if lesson_date and lesson_date < timezone.now().date():
+            raise ValidationError("Cannot book appointments for past dates.")
+        return lesson_date
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        lesson_date = cleaned_data.get('lesson_date')
+        lesson_time = cleaned_data.get('lesson_time')
+        
+        # Additional validation: if both date and time are provided, check if it's in the past
+        if lesson_date and lesson_time:
+            from datetime import datetime
+            lesson_datetime = datetime.combine(lesson_date, lesson_time)
+            current_naive = timezone.now().replace(tzinfo=None)
+            
+            if lesson_datetime < current_naive:
+                raise ValidationError("Cannot book appointments for past date and time.")
+        
+        # Check for existing appointments on the same date
+        if lesson_date:
+            # Check for existing performance appointments on the same date
+            existing_performance = PerformanceAppointment.objects.filter(
+                event_date=lesson_date,
+                status='Accepted'
+            ).exists()
+            
+            # Check for existing lesson appointments on the same date
+            existing_lesson = LessonAppointment.objects.filter(
+                lesson_date=lesson_date,
+                status='Accepted'
+            ).exists()
+            
+            if existing_performance:
+                self.add_error('lesson_date', f"We already have an accepted performance appointment on {lesson_date}. Please choose a different date.")
+            
+            if existing_lesson:
+                self.add_error('lesson_date', f"We already have an accepted lesson appointment on {lesson_date}. Please choose a different date.")
+        
+        return cleaned_data

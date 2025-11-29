@@ -603,7 +603,7 @@
 </div>
     <!-- Instrument icons section -->
     <div class="instrument-icons">
-        {% for instrument in Instruments|slice:":6" %}
+        {% for instrument in Instruments|slice:":5" %}
             {% if instrument.image %}
                 <img src="{{ instrument.image.url }}" title="{{ instrument.name }}" alt="{{ instrument.name }}" class="instrument-icon">
             {% endif %}
