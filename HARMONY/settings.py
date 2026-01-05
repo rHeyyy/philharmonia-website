@@ -247,36 +247,3 @@ if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
 else:
     print("⚠️ R2 credentials not found, using local media storage")
     # Keep default MEDIA_URL and MEDIA_ROOT from above
-
-# ================= RENDER EMERGENCY OVERRIDE =================
-# This MUST be the LAST section in the file
-# It OVERRIDES everything above for Render deployment
-if os.environ.get('RENDER'):
-    print("=" * 60)
-    print("🚨 RENDER EMERGENCY OVERRIDE ACTIVE")
-    print("=" * 60)
-    
-    # CRITICAL: Disable R2 temporarily to get site working
-    print("🔧 OVERRIDE: Force disabling R2, using local storage")
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_URL = '/media/'
-    
-    # Force production settings
-    DEBUG = False
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    
-    # Force correct static files storage
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-    
-    # Ensure Render host is in allowed hosts
-    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-    if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-        print(f"✅ OVERRIDE: Added {RENDER_EXTERNAL_HOSTNAME} to ALLOWED_HOSTS")
-    
-    print("🎯 OVERRIDE COMPLETE: R2 disabled, using local storage")
-    print("🎯 Site should now work on Render")
-    print("=" * 60)
