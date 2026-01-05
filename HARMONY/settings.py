@@ -14,27 +14,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------
 # SECURITY
 # --------------------------
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-for-dev")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# --------------------------
-# ALLOWED HOSTS
-# --------------------------
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".railway.app",
     ".up.railway.app",
-    ".render.com",
+    "philharmonia-website-production.up.railway.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://philharmonia-website-production.up.railway.app",
+    "https://*.railway.app",
 ]
 
 # --------------------------
-# CSRF
+# HTTPS / SSL SETTINGS (Fix Google OAuth redirect)
 # --------------------------
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.railway.app",
-    "https://*.render.com",
-]
+if os.environ.get("RAILWAY_ENVIRONMENT"):  # Only in production
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # --------------------------
 # APPLICATION DEFINITION
@@ -48,20 +49,17 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
 
-    # Local
+    # Local apps
     "app.apps.AppConfig",
 
-    # Third-party
+    # Third-party apps
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    "storages",
+    "storages",  # Cloudflare R2
 ]
 
-# --------------------------
-# MIDDLEWARE
-# --------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -77,9 +75,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "HARMONY.urls"
 
-# --------------------------
-# TEMPLATES
-# --------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -101,14 +96,11 @@ WSGI_APPLICATION = "HARMONY.wsgi.application"
 # --------------------------
 # DATABASE
 # --------------------------
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-if DATABASE_URL:
+if os.environ.get("DATABASE_URL"):
     DATABASES = {
         "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
+            default=os.environ.get("DATABASE_URL"),
+            conn_max_age=600
         )
     }
 else:
@@ -142,21 +134,17 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # --------------------------
-# MEDIA (Local fallback)
+# MEDIA FILES
 # --------------------------
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "images"
 
-# --------------------------
-# DEFAULT FIELD
-# --------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --------------------------
-# AUTH
+# AUTHENTICATION
 # --------------------------
 AUTH_USER_MODEL = "app.CustomUser"
 
@@ -165,30 +153,36 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-SITE_ID = 1
+# Set SITE_ID to the production site ID
+SITE_ID = 2  # Change if your production site has a different ID
 
 LOGIN_REDIRECT_URL = "/user_home/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
 
 # --------------------------
-# ALLAUTH
+# ALLAUTH SETTINGS
 # --------------------------
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_PREVENT_ENUMERATION = False
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
 SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_STORE_TOKENS = True
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {
             "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
             "secret": os.environ.get("GOOGLE_SECRET"),
+            "key": ""
         },
         "SCOPE": ["profile", "email"],
         "AUTH_PARAMS": {"access_type": "online"},
@@ -196,37 +190,24 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# ================= PLATFORM DETECTION =================
-IS_RAILWAY = os.environ.get("RAILWAY_ENVIRONMENT") is not None
-IS_RENDER = os.environ.get("RENDER") == "true"
-IS_PRODUCTION = IS_RAILWAY or IS_RENDER
+# --------------------------
+# CLOUDFLARE R2 STORAGE (Production)
+# --------------------------
+R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID")
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
+R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "philharmonia-media")
 
-# ================= RENDER HOST =================
-if IS_RENDER:
-    RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-    if RENDER_EXTERNAL_HOSTNAME:
-        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-        CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
-
-# ================= PRODUCTION SECURITY =================
-if IS_PRODUCTION:
-    DEBUG = False
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
-# ================= CLOUDFLARE R2 =================
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID") or os.environ.get("R2_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY") or os.environ.get("R2_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME") or os.environ.get("R2_BUCKET_NAME")
-AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL")
-AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN")
-
-if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY and AWS_S3_ENDPOINT_URL:
+if os.environ.get("RAILWAY_ENVIRONMENT"):
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    AWS_ACCESS_KEY_ID = R2_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY = R2_SECRET_ACCESS_KEY
+    AWS_STORAGE_BUCKET_NAME = R2_BUCKET_NAME
+    AWS_S3_ENDPOINT_URL = "https://0b418dde0bb4950435f6df4b43427951.r2.cloudflarestorage.com"
     AWS_S3_REGION_NAME = "auto"
-    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_CUSTOM_DOMAIN = "pub-a8c070b615064b4391ac33a8916b8b24.r2.dev"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
     AWS_DEFAULT_ACL = "public-read"
+    AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = False

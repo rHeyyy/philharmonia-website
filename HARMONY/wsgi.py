@@ -8,12 +8,9 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 """
 
 import os
+
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'HARMONY.settings')
 
 application = get_wsgi_application()
-
-# 🔥 CRITICAL: Add these 2 lines for Render
-from whitenoise import WhiteNoise
-application = WhiteNoise(application)
