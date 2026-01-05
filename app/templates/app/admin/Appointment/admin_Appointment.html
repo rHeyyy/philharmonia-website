@@ -78,8 +78,6 @@
                             <th>Event Type</th>
                             <th>Location</th>
                             <th>Date</th>
-                            <th>Time</th>
-                            <th>Message</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -92,8 +90,6 @@
                             <td>{{ Performance.event_type }}</td>
                             <td>{{ Performance.event_location }}</td>
                             <td>{{ Performance.event_date }}</td>
-                            <td>{{ Performance.event_time }}</td>
-                            <td>{{ Performance.message }}</td>
                             <td>
                                 <button class="status-select status-{{ Performance.status|lower }} edit-performance-status" 
                                         data-performance-id3="{{ Performance.pk }}">
@@ -102,11 +98,11 @@
                             </td>
                             <td>
                                 <a class="action-link edit-Performance" href="" data-Performance-id="{{ Performance.pk }}">
-                                    <i class="fa-solid fa-pen" title="Edit Performance"></i>
+                                    <i class="fa-solid fa-eye" title="Edit Performance"></i>
                                 </a>
                                 |
                                 <a class="action-link delete-Performance" href="" data-Performance-id2="{{ Performance.pk }}">
-                                    <i class="fa-solid fa-trash" title="Delete Performance"></i>
+                                    <i class="fa-solid fa-trash" title="View Appointment"></i>
                                 </a>
                             </td>
                         </tr>
@@ -207,6 +203,38 @@
     </div>
 
 <script>
+      function toggleDeclineReason() {
+        var statusSelect = document.getElementById('id_status');
+        var declineReasonGroup = document.getElementById('declineReasonGroup');
+        
+        if (statusSelect.value === 'Declined') {
+            declineReasonGroup.style.display = 'block';
+            document.getElementById('id_decline_reason').required = true;
+        } else {
+            declineReasonGroup.style.display = 'none';
+            document.getElementById('id_decline_reason').required = false;
+        }
+    }
+    
+    function validateForm() {
+        var statusSelect = document.getElementById('id_status');
+        var declineReason = document.getElementById('id_decline_reason');
+        
+        if (statusSelect.value === 'Declined') {
+            if (!declineReason.value.trim()) {
+                alert('Please provide a reason for declining the appointment.');
+                declineReason.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleDeclineReason();
+    });
+
     // create Performance
 document.addEventListener("DOMContentLoaded", () => {
     const addPerformancemodal = document.getElementById("Create-Performance-Modal");
@@ -496,8 +524,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             <th>Class Size</th>
                             <th>Location</th>
                             <th>Date</th>
-                            <th>Time</th>
-                            <th>Message</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -510,8 +536,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <td>{{ Lesson.class_size }}</td>
                             <td>{{ Lesson.location }}</td>
                             <td>{{ Lesson.lesson_date }}</td>
-                            <td>{{ Lesson.lesson_time }}</td>
-                            <td>{{ Lesson.message }}</td>
+
                             <td>
                                 <button class="status-select status-{{ Lesson.status|lower }} edit-Lesson-status" 
                                         data-Lesson-id3="{{ Lesson.pk }}">
@@ -520,7 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             </td>
                             <td>
                                 <a class="action-link edit-Lesson" href="" data-Lesson-id="{{ Lesson.pk }}">
-                                    <i class="fa-solid fa-pen" title="Edit Lesson"></i>
+                                    <i class="fa-solid fa-eye" title="View Appointment"></i>
                                 </a>
                                 |
                                 <a class="action-link delete-Lesson" href="" data-Lesson-id2="{{ Lesson.pk }}">
@@ -626,6 +651,37 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
 <script>
+        function toggleDeclineReason() {
+        var statusSelect = document.getElementById('id_status');
+        var declineReasonGroup = document.getElementById('declineReasonGroup');
+        
+        if (statusSelect.value === 'Declined') {
+            declineReasonGroup.style.display = 'block';
+            document.getElementById('id_decline_reason').required = true;
+        } else {
+            declineReasonGroup.style.display = 'none';
+            document.getElementById('id_decline_reason').required = false;
+        }
+    }
+    
+    function validateForm() {
+        var statusSelect = document.getElementById('id_status');
+        var declineReason = document.getElementById('id_decline_reason');
+        
+        if (statusSelect.value === 'Declined') {
+            if (!declineReason.value.trim()) {
+                alert('Please provide a reason for declining the appointment.');
+                declineReason.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleDeclineReason();
+    });
     // create Lesson
 document.addEventListener("DOMContentLoaded", () => {
     const addLessonmodal = document.getElementById("Create-Lesson-Modal");

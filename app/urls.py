@@ -318,7 +318,8 @@ urlpatterns = [
     path('get_category_chart_data/', get_category_chart_data, name='get_category_chart_data'),
     path("get_login_chart_data/", get_login_chart_data, name="get_login_chart_data"),
 
-
+    path('update-performance/<int:pk>/', views.update_performance, name='update_performance'),
+    path('update-lesson/<int:pk>/', views.update_lesson, name='update_lesson'),
     # Performance
     path('user_Performance/<int:pk>/edit/', UserUpdatePerformance.as_view(), name='UserUpdatePerformance'),
     path('user_Performance/<int:pk>/delete/', UserDeletePerformance.as_view(), name='UserDeletePerformance'),

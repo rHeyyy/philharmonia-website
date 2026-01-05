@@ -31,13 +31,6 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # --------------------------
-# HTTPS / SSL SETTINGS (Fix Google OAuth redirect)
-# --------------------------
-if os.environ.get("RAILWAY_ENVIRONMENT"):  # Only in production
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# --------------------------
 # APPLICATION DEFINITION
 # --------------------------
 INSTALLED_APPS = [
@@ -96,14 +89,19 @@ WSGI_APPLICATION = "HARMONY.wsgi.application"
 # --------------------------
 # DATABASE
 # --------------------------
-if os.environ.get("DATABASE_URL"):
+# Render provides DATABASE_URL, Railway provides DATABASE_URL
+# Both will work with this configuration
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.config(
-            default=os.environ.get("DATABASE_URL"),
-            conn_max_age=600
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
         )
     }
 else:
+    # Local development
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -136,7 +134,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # --------------------------
-# MEDIA FILES
+# DEFAULT MEDIA (Will be overridden by R2 if available)
 # --------------------------
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "images"
@@ -190,24 +188,62 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# --------------------------
-# CLOUDFLARE R2 STORAGE (Production)
-# --------------------------
-R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID")
-R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
-R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
-R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME", "philharmonia-media")
+# ================= PLATFORM DETECTION =================
+IS_RAILWAY = os.environ.get("RAILWAY_ENVIRONMENT") is not None
+IS_RENDER = os.environ.get('RENDER', '').lower() == 'true'
+IS_PRODUCTION = IS_RAILWAY or IS_RENDER
 
-if os.environ.get("RAILWAY_ENVIRONMENT"):
+print(f"🚀 Platform: {'Railway' if IS_RAILWAY else 'Render' if IS_RENDER else 'Local'}")
+
+# ================= RENDER SPECIFIC SETTINGS =================
+if IS_RENDER:
+    # Add Render hostname to allowed hosts
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+        CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+        print(f"✅ Added {RENDER_EXTERNAL_HOSTNAME} to allowed hosts")
+
+# ================= PRODUCTION SECURITY SETTINGS =================
+if IS_PRODUCTION:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    DEBUG = False
+    
+    # Static files with WhiteNoise
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# ================= CLOUDFLARE R2 CONFIGURATION =================
+# Support both R2_ and AWS_ environment variable names
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID") or os.environ.get("R2_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY") or os.environ.get("R2_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME") or os.environ.get("R2_BUCKET_NAME", "philharmonia-media")
+AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL") or "https://0b418dde0bb4950435f6df4b43427951.r2.cloudflarestorage.com"
+AWS_S3_REGION_NAME = "auto"
+AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN") or "pub-a8c070b615064b4391ac33a8916b8b24.r2.dev"
+
+# Enable R2 if credentials are available (for both Railway and Render)
+if AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
+    print(f"✅ R2 Storage Enabled - Bucket: {AWS_STORAGE_BUCKET_NAME}")
+    
+    # Use R2 for media files
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-    AWS_ACCESS_KEY_ID = R2_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY = R2_SECRET_ACCESS_KEY
-    AWS_STORAGE_BUCKET_NAME = R2_BUCKET_NAME
-    AWS_S3_ENDPOINT_URL = "https://0b418dde0bb4950435f6df4b43427951.r2.cloudflarestorage.com"
-    AWS_S3_REGION_NAME = "auto"
-    AWS_S3_CUSTOM_DOMAIN = "pub-a8c070b615064b4391ac33a8916b8b24.r2.dev"
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    
+    # R2 configuration
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
     AWS_DEFAULT_ACL = "public-read"
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = False
+    
+    if IS_RENDER:
+        print("🎯 Storage: Using R2 on RENDER deployment")
+    elif IS_RAILWAY:
+        print("🎯 Storage: Using R2 on RAILWAY deployment")
+    else:
+        print("🎯 Storage: Using R2 on LOCAL development")
+else:
+    print("⚠️ R2 credentials not found, using local media storage")
+    # Keep default MEDIA_URL and MEDIA_ROOT from above

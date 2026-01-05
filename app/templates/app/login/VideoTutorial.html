@@ -610,857 +610,899 @@ function hideModal() {
   }, 300);
 }
 </script>
-<style>
- /* Add Font Awesome */
- @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-
-:root {
-  --primary1: #ff6b00;
-  --primary-light1: #ff8b33;
-  --secondary1: #00a8e8;
-  --secondary-light1: #33b9ed;
-  --dark1: #121212;
-  --darker1: #0a0a0a;
-  --dark-light1: #1e1e1e;
-  --light1: #f8f9fa;
-  --lighter1: #ffffff;
-  --accent1: #ffc107;
-  --accent-light1: #ffd54f;
-  --text1: rgba(255, 255, 255, 0.9);
-  --text-light1: rgba(255, 255, 255, 0.7);
-}
-
-/* Layout Structure */
-.performance-container {
-  display: flex;
-  height: 100vh;
-  background: var(--darker1);
-  overflow: hidden;
-}
-
-/* Side Navigation Styles */
-.sidenavbar {
-  width: 250px;
-  background: var(--dark1);
-  color: var(--lighter1);
-  padding: 20px 0;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--dark-light1);
-  overflow: hidden;
-}
-
-.sidenav-header {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid var(--dark-light1);
-  margin-bottom: 20px;
-}
-
-.sidenav-header h3 {
-  color: var(--primary1);
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-}
-
-.sidenav-header i {
-  margin-right: 10px;
-}
-
-/* Menu container and navigation buttons */
-.sidenav-menu-container {
-  position: relative;
-  flex: 1;
-  overflow-y: auto;
-  max-height: calc(100vh - 120px);
-}
-
-.sidenav-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  height: 100%;
-}
-
-/* Navigation buttons */
-.nav-button {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(30, 30, 30, 0.8);
-  color: var(--text-light1);
-  border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 2;
-}
-
-.prev-button {
-  left: 10px;
-}
-
-.next-button {
-  right: 10px;
-}
-
-.nav-button:hover {
-  background: var(--accent1);
-  color: #000;
-}
-
-.nav-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.nav-button:disabled:hover {
-  background: rgba(30, 30, 30, 0.8);
-  color: var(--text-light1);
-}
-
-/* Hide scrollbar but keep functionality */
-.sidenav-menu {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.sidenav-menu::-webkit-scrollbar {
-  display: none;
-}
-
-.sidenav-menu li {
-  padding: 12px 20px;
-  transition: all 0.3s ease;
-  border-left: 3px solid transparent;
-}
-
-.sidenav-menu li:hover {
-  background: rgba(255, 193, 7, 0.1);
-}
-
-.sidenav-menu li.active {
-  background: rgba(255, 193, 7, 0.2);
-  border-left: 3px solid var(--accent1);
-}
-
-.sidenav-menu a {
-  color: var(--text-light1);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-
-.sidenav-menu i {
-  margin-right: 10px;
-  width: 20px;
-  text-align: center;
-}
-
-.sidenav-footer {
-  padding: 20px;
-  font-size: 0.8rem;
-  color: var(--text-light1);
-  text-align: center;
-  border-top: 1px solid var(--dark-light1);
-}
-
-/* Main Content Styles */
-.performance-gallery {
-  flex: 1;
-  padding: 40px;
-  overflow-y: auto;
-  height: 100vh;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 40px;
-  position: relative;
-  top: 0;
-  background: var(--darker1);
-  z-index: 10;
-  padding: 20px 0;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.section-header h2 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: var(--primary1);
-  font-weight: 600;
-}
-
-.section-header h2 i {
-  margin-right: 15px;
-}
-
-.section-header p {
-  color: var(--text-light1);
-  font-size: 1.1rem;
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.video-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 30px;
-  padding-bottom: 20px;
-}
-
-.video-card {
-  background: var(--dark-light1);
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.video-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-}
-
-.video-wrapper {
-  position: relative;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
-  background: #000;
-}
-
-.video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.video-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
-.video-card:hover .video-overlay {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.play-button {
-  width: 70px;
-  height: 70px;
-  background: var(--accent1);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.play-button i {
-  color: #000;
-  font-size: 24px;
-  margin-left: 5px;
-}
-
-.play-button:hover {
-  transform: scale(1.1);
-  background: var(--accent-light1);
-}
-
-.video-controls {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
-  display: flex;
-  gap: 10px;
-}
-
-.control-btn {
-  background: rgba(0, 0, 0, 0.7);
-  color: var(--lighter1);
-  border: none;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.control-btn:hover {
-  background: rgba(255, 193, 7, 0.9);
-  color: #000;
-}
-
-.video-info {
-  padding: 20px;
-}
-
-.performance-meta {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  font-size: 0.9rem;
-  color: var(--text-light1);
-}
-
-.performance-meta i {
-  margin-right: 5px;
-}
-
-.video-title {
-  font-size: 1.3rem;
-  margin-bottom: 10px;
-  color: var(--text1);
-}
-
-.video-description {
-  color: var(--text-light1);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-bottom: 20px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.watch-btn {
-  flex: 1;
-  background: linear-gradient(135deg, var(--accent1), var(--accent-light1));
-  color: #000;
-  padding: 10px 15px;
-  border-radius: 4px;
-  text-align: center;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.watch-btn i {
-  margin-right: 8px;
-}
-
-.watch-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
-}
-
-.save-btn {
-  background: transparent;
-  color: var(--text-light1);
-  border: 1px solid var(--dark-light1);
-  padding: 10px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.save-btn.saved {
-  color: var(--accent1);
-  border-color: var(--accent1);
-}
-
-.save-btn.saved i {
-  font-weight: 900;
-}
-
-.save-btn:hover {
-  color: var(--accent1);
-  border-color: var(--accent1);
-}
-
-/* Save feedback styles */
-.save-feedback {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--accent1);
-  color: #000;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-weight: bold;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 1000;
-}
-
-.save-feedback.show {
-  opacity: 1;
-}
-
-/* Empty state styles */
-.empty-state {
-  text-align: center;
-  padding: 50px 20px;
-  color: var(--text-light1);
-  grid-column: 1 / -1;
-}
-
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 20px;
-  color: var(--dark-light1);
-}
-
-.empty-state h3 {
-  color: var(--text1);
-  margin-bottom: 15px;
-}
-
-/* Responsive Design */
-@media (max-width: 992px) {
-  .performance-container {
-    flex-direction: column;
-  }
-  
-  .sidenavbar {
-    width: 100%;
-    padding: 10px 0;
-    max-height: none;
-  }
-  
-  .sidenav-menu {
-    display: flex;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding: 0 30px;
-  }
-  
-  .sidenav-menu li {
-    white-space: nowrap;
-    border-left: none;
-    border-bottom: 3px solid transparent;
-    flex: 0 0 auto;
-  }
-  
-  .sidenav-menu li.active {
-    border-left: none;
-    border-bottom: 3px solid var(--accent1);
-  }
-  
-  /* Show and style navigation buttons on mobile */
-  .nav-button {
-    display: flex;
-    width: 40px;
-    height: 40px;
-    background: var(--dark-light1);
-  }
-  
-  .prev-button {
-    left: 5px;
-  }
-  
-  .next-button {
-    right: 5px;
-  }
-  
-  .performance-gallery {
-    padding: 20px;
-    height: auto;
-  }
-  
-  .section-header {
-    position: static;
-  }
-}
-
-@media (max-width: 768px) {
-  .video-gallery {
-    grid-template-columns: 1fr;
-  }
-  
-  .section-header h2 {
-    font-size: 2rem;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-  }
-}
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Track currently playing video
-    let currentlyPlaying = null;
-    
-    // Initialize saved videos from local storage
-    let savedVideos = JSON.parse(localStorage.getItem('savedVideos')) || [];
-    
-    // Play/Pause button functionality
-    document.querySelectorAll('.play-button').forEach(button => {
-      button.addEventListener('click', function() {
-        const videoWrapper = this.closest('.video-wrapper');
-        const video = videoWrapper.querySelector('.video');
-        const overlay = videoWrapper.querySelector('.video-overlay');
-        const playButtonIcon = this.querySelector('i');
-        
-        // Pause any currently playing video
-        if (currentlyPlaying && currentlyPlaying !== video) {
-          currentlyPlaying.pause();
-          const otherOverlay = currentlyPlaying.closest('.video-wrapper').querySelector('.video-overlay');
-          otherOverlay.style.opacity = '1';
-          otherOverlay.style.pointerEvents = 'auto';
-          otherOverlay.querySelector('.play-button i').className = 'fas fa-play';
+    <style>
+        :root {
+            --primary1: #ff6b00;
+            --primary-light1: #ff8b33;
+            --secondary1: #00a8e8;
+            --secondary-light1: #33b9ed;
+            --dark1: #121212;
+            --darker1: #0a0a0a;
+            --dark-light1: #1e1e1e;
+            --light1: #f8f9fa;
+            --lighter1: #ffffff;
+            --accent1: #ffc107;
+            --accent-light1: #ffd54f;
+            --text1: rgba(255, 255, 255, 0.9);
+            --text-light1: rgba(255, 255, 255, 0.7);
         }
-        
-        // Toggle play/pause
-        if (video.paused) {
-          video.play();
-          playButtonIcon.className = 'fas fa-pause';
-          currentlyPlaying = video;
-          overlay.style.opacity = '0';
-          overlay.style.pointerEvents = 'none';
-          
-          // Update view count
-          const videoId = video.closest('.video-card').dataset.videoId;
-          fetch(`/api/videos/${videoId}/view/`, {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': getCookie('csrftoken'),
-              'Content-Type': 'application/json',
+
+        /* Layout Structure */
+        .performance-container {
+            display: flex;
+            height: 100vh;
+            background: var(--darker1);
+            overflow: hidden;
+        }
+
+        /* Side Navigation Styles */
+        .sidenavbar {
+            width: 250px;
+            background: var(--dark1);
+            color: var(--lighter1);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--dark-light1);
+            overflow: hidden;
+        }
+
+        .sidenav-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--dark-light1);
+            margin-bottom: 20px;
+        }
+
+        .sidenav-header h3 {
+            color: var(--primary1);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidenav-header i {
+            margin-right: 10px;
+        }
+
+        /* Menu container and navigation buttons */
+        .sidenav-menu-container {
+            position: relative;
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+        }
+
+        .sidenav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+
+        /* Navigation buttons */
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(30, 30, 30, 0.8);
+            color: var(--text-light1);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .prev-button {
+            left: 10px;
+        }
+
+        .next-button {
+            right: 10px;
+        }
+
+        .nav-button:hover {
+            background: var(--accent1);
+            color: #000;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-button:disabled:hover {
+            background: rgba(30, 30, 30, 0.8);
+            color: var(--text-light1);
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .sidenav-menu {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .sidenav-menu::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sidenav-menu li {
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidenav-menu li:hover {
+            background: rgba(255, 193, 7, 0.1);
+        }
+
+        .sidenav-menu li.active {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 3px solid var(--accent1);
+        }
+
+        .sidenav-menu a {
+            color: var(--text-light1);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidenav-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidenav-footer {
+            padding: 20px;
+            font-size: 0.8rem;
+            color: var(--text-light1);
+            text-align: center;
+            border-top: 1px solid var(--dark-light1);
+        }
+
+        /* Main Content Styles */
+        .performance-gallery {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            top: 0;
+            background: var(--darker1);
+            z-index: 10;
+            padding: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary1);
+            font-weight: 600;
+        }
+
+        .section-header h2 i {
+            margin-right: 15px;
+        }
+
+        .section-header p {
+            color: var(--text-light1);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .video-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            padding-bottom: 20px;
+        }
+
+        .video-card {
+            background: var(--dark-light1);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background: #000;
+        }
+
+        .video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover .video-overlay {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .play-button {
+            width: 70px;
+            height: 70px;
+            background: var(--accent1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .play-button i {
+            color: #000;
+            font-size: 24px;
+            margin-left: 5px;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            background: var(--accent-light1);
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: var(--lighter1);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 193, 7, 0.9);
+            color: #000;
+        }
+
+        .video-info {
+            padding: 20px;
+        }
+
+        .performance-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: var(--text-light1);
+        }
+
+        .performance-meta i {
+            margin-right: 5px;
+        }
+
+        .video-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text1);
+        }
+
+        .video-description {
+            color: var(--text-light1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .watch-btn {
+            flex: 1;
+            background: linear-gradient(135deg, var(--accent1), var(--accent-light1));
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .watch-btn i {
+            margin-right: 8px;
+        }
+
+        .watch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+
+        .save-btn {
+            background: transparent;
+            color: var(--text-light1);
+            border: 1px solid var(--dark-light1);
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn.saved {
+            color: var(--accent1);
+            border-color: var(--accent1);
+        }
+
+        .save-btn.saved i {
+            font-weight: 900;
+        }
+
+        .save-btn:hover {
+            color: var(--accent1);
+            border-color: var(--accent1);
+        }
+
+        /* Save feedback styles */
+        .save-feedback {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent1);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .save-feedback.show {
+            opacity: 1;
+        }
+
+        /* Empty state styles */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-light1);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--dark-light1);
+        }
+
+        .empty-state h3 {
+            color: var(--text1);
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .performance-container {
+                flex-direction: column;
             }
-          });
-        } else {
-          video.pause();
-          playButtonIcon.className = 'fas fa-play';
-          currentlyPlaying = null;
-          overlay.style.opacity = '1';
-          overlay.style.pointerEvents = 'auto';
-        }
-      });
-    });
-    
-    // Click on video to pause
-    document.querySelectorAll('.video').forEach(video => {
-      video.addEventListener('click', function() {
-        if (!this.paused) {
-          this.pause();
-          const overlay = this.closest('.video-wrapper').querySelector('.video-overlay');
-          overlay.style.opacity = '1';
-          overlay.style.pointerEvents = 'auto';
-          overlay.querySelector('.play-button i').className = 'fas fa-play';
-          currentlyPlaying = null;
-        }
-      });
-    });
-    
-    // Fullscreen button functionality
-    document.querySelectorAll('.control-btn').forEach(button => {
-      button.addEventListener('click', function(e) {
-        e.stopPropagation();
-        
-        if (this.querySelector('.fa-expand')) {
-          const videoWrapper = this.closest('.video-wrapper');
-          const video = videoWrapper.querySelector('.video');
-          
-          if (video.requestFullscreen) {
-            video.requestFullscreen();
-          } else if (video.webkitRequestFullscreen) {
-            video.webkitRequestFullscreen();
-          } else if (video.msRequestFullscreen) {
-            video.msRequestFullscreen();
-          }
-        } else if (this.querySelector('.fa-volume-up, .fa-volume-mute')) {
-          // Toggle mute
-          const video = this.closest('.video-wrapper').querySelector('.video');
-          video.muted = !video.muted;
-          this.querySelector('i').className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-        }
-      });
-    });
-    
-    // Video ended event to show overlay again
-    document.querySelectorAll('.video').forEach(video => {
-      video.addEventListener('ended', function() {
-        const overlay = this.closest('.video-wrapper').querySelector('.video-overlay');
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        overlay.querySelector('.play-button i').className = 'fas fa-play';
-        currentlyPlaying = null;
-      });
-      
-      // Pause event to handle when user manually pauses
-      video.addEventListener('pause', function() {
-        if (currentlyPlaying === this) {
-          const overlay = this.closest('.video-wrapper').querySelector('.video-overlay');
-          overlay.style.opacity = '1';
-          overlay.style.pointerEvents = 'auto';
-          overlay.querySelector('.play-button i').className = 'fas fa-play';
-          currentlyPlaying = null;
-        }
-      });
-    });
-    
-    // Save button functionality
-    document.querySelectorAll('.save-btn').forEach(button => {
-      const videoCard = button.closest('.video-card');
-      const videoId = videoCard.dataset.videoId;
-      
-      // Set initial saved state
-      if (savedVideos.includes(videoId)) {
-        button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
-        button.classList.add('saved');
-      }
-      
-      button.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const videoId = this.closest('.video-card').dataset.videoId;
-        const index = savedVideos.indexOf(videoId);
-        
-        if (index === -1) {
-          // Save video
-          savedVideos.push(videoId);
-          this.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
-          this.classList.add('saved');
-          
-          // Show feedback
-          showSaveFeedback('Video saved!');
-        } else {
-          // Unsave video
-          savedVideos.splice(index, 1);
-          this.innerHTML = '<i class="far fa-bookmark"></i> Save';
-          this.classList.remove('saved');
-          
-          // Show feedback
-          showSaveFeedback('Video removed!');
-          
-          // If we're on the saved page, hide the video
-          const currentTab = document.querySelector('.sidenav-menu li.active a').getAttribute('href');
-          if (currentTab === '#saved') {
-            this.closest('.video-card').style.display = 'none';
             
-            // Check if there are no more saved videos
-            const remainingSavedVideos = document.querySelectorAll('.video-card[style="display: block;"]').length;
-            if (remainingSavedVideos === 0) {
-              document.querySelector('.section-header').innerHTML = `
-                <h2><i class="fas fa-bookmark"></i> No Saved Performances</h2>
-                <p>Save performances by clicking the "Save" button on videos</p>
-              `;
+            .sidenavbar {
+                width: 100%;
+                padding: 10px 0;
+                max-height: none;
             }
-          }
+            
+            .sidenav-menu {
+                display: flex;
+                overflow-x: auto;
+                scroll-behavior: smooth;
+                padding: 0 30px;
+            }
+            
+            .sidenav-menu li {
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                flex: 0 0 auto;
+            }
+            
+            .sidenav-menu li.active {
+                border-left: none;
+                border-bottom: 3px solid var(--accent1);
+            }
+            
+            /* Show and style navigation buttons on mobile */
+            .nav-button {
+                display: flex;
+                width: 40px;
+                height: 40px;
+                background: var(--dark-light1);
+            }
+            
+            .prev-button {
+                left: 5px;
+            }
+            
+            .next-button {
+                right: 5px;
+            }
+            
+            .performance-gallery {
+                padding: 20px;
+                height: auto;
+            }
+            
+            .section-header {
+                position: static;
+            }
         }
-        
-        // Update local storage
-        localStorage.setItem('savedVideos', JSON.stringify(savedVideos));
-      });
-    });
-    
-    // Side navigation click handlers
-    document.querySelectorAll('.sidenav-menu a').forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = this.getAttribute('href').substring(1);
-        
-        // Update active state
-        document.querySelectorAll('.sidenav-menu li').forEach(item => {
-          item.classList.remove('active');
+
+        @media (max-width: 768px) {
+            .video-gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track currently playing video
+            let currentlyPlaying = null;
+            
+            // Initialize saved videos from local storage
+            let savedVideos = JSON.parse(localStorage.getItem('savedVideos')) || [];
+            
+            // Set up Intersection Observer to pause videos when not visible
+            const videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target;
+                    if (!entry.isIntersecting && !video.paused) {
+                        video.pause();
+                        const overlay = video.closest('.video-wrapper').querySelector('.video-overlay');
+                        overlay.style.opacity = '1';
+                        overlay.style.pointerEvents = 'auto';
+                        overlay.querySelector('.play-button i').className = 'fas fa-play';
+                        
+                        if (currentlyPlaying === video) {
+                            currentlyPlaying = null;
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.5 // Trigger when 50% of the video is visible
+            });
+            
+            // Observe all videos
+            document.querySelectorAll('.video').forEach(video => {
+                videoObserver.observe(video);
+            });
+            
+            // Play/Pause button functionality
+            document.querySelectorAll('.play-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const videoWrapper = this.closest('.video-wrapper');
+                    const video = videoWrapper.querySelector('.video');
+                    const overlay = videoWrapper.querySelector('.video-overlay');
+                    const playButtonIcon = this.querySelector('i');
+                    const videoCard = videoWrapper.closest('.video-card');
+                    const videoId = videoCard.dataset.videoId;
+                    
+                    // Pause any currently playing video
+                    if (currentlyPlaying && currentlyPlaying !== video) {
+                        currentlyPlaying.pause();
+                        const otherOverlay = currentlyPlaying.closest('.video-wrapper').querySelector('.video-overlay');
+                        otherOverlay.style.opacity = '1';
+                        otherOverlay.style.pointerEvents = 'auto';
+                        otherOverlay.querySelector('.play-button i').className = 'fas fa-play';
+                    }
+                    
+                    // Toggle play/pause
+                    if (video.paused) {
+                        video.play();
+                        playButtonIcon.className = 'fas fa-pause';
+                        currentlyPlaying = video;
+                        overlay.style.opacity = '0';
+                        overlay.style.pointerEvents = 'none';
+                        
+                        // COUNT VIEW WHEN VIDEO STARTS PLAYING
+                        // Simulate view count increment (replace with actual fetch call)
+                        const viewsElement = videoCard.querySelector('.views');
+                        if (viewsElement) {
+                            const currentViews = parseInt(viewsElement.textContent.replace(/\D/g, ''));
+                            viewsElement.innerHTML = `<i class="fas fa-eye"></i> ${currentViews + 1} views`;
+                        }
+                        
+                    } else {
+                        video.pause();
+                        playButtonIcon.className = 'fas fa-play';
+                        currentlyPlaying = null;
+                        overlay.style.opacity = '1';
+                        overlay.style.pointerEvents = 'auto';
+                    }
+                });
+            });
+            
+            // Click on video to pause
+            document.querySelectorAll('.video').forEach(video => {
+                video.addEventListener('click', function() {
+                    if (!this.paused) {
+                        this.pause();
+                        const overlay = this.closest('.video-wrapper').querySelector('.video-overlay');
+                        overlay.style.opacity = '1';
+                        overlay.style.pointerEvents = 'auto';
+                        overlay.querySelector('.play-button i').className = 'fas fa-play';
+                        currentlyPlaying = null;
+                    }
+                });
+            });
+            
+            // Fullscreen button functionality
+            document.querySelectorAll('.control-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    if (this.querySelector('.fa-expand')) {
+                        const videoWrapper = this.closest('.video-wrapper');
+                        const video = videoWrapper.querySelector('.video');
+                        
+                        if (video.requestFullscreen) {
+                            video.requestFullscreen();
+                        } else if (video.webkitRequestFullscreen) {
+                            video.webkitRequestFullscreen();
+                        } else if (video.msRequestFullscreen) {
+                            video.msRequestFullscreen();
+                        }
+                    } else if (this.querySelector('.fa-volume-up, .fa-volume-mute')) {
+                        // Toggle mute
+                        const video = this.closest('.video-wrapper').querySelector('.video');
+                        video.muted = !video.muted;
+                        this.querySelector('i').className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+                    }
+                });
+            });
+            
+            // Handle fullscreen changes
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+            
+            function handleFullscreenChange() {
+                const fullscreenElement = document.fullscreenElement || 
+                                         document.webkitFullscreenElement || 
+                                         document.mozFullScreenElement || 
+                                         document.msFullscreenElement;
+                
+                // If a video entered fullscreen, pause other videos
+                if (fullscreenElement && fullscreenElement.tagName === 'VIDEO') {
+                    // Pause any currently playing video that's not the fullscreen one
+                    if (currentlyPlaying && currentlyPlaying !== fullscreenElement) {
+                        currentlyPlaying.pause();
+                        const otherOverlay = currentlyPlaying.closest('.video-wrapper').querySelector('.video-overlay');
+                        otherOverlay.style.opacity = '1';
+                        otherOverlay.style.pointerEvents = 'auto';
+                        otherOverlay.querySelector('.play-button i').className = 'fas fa-play';
+                    }
+                    
+                    // Set the fullscreen video as currently playing
+                    currentlyPlaying = fullscreenElement;
+                }
+                
+                // If exiting fullscreen, update the play button
+                if (!fullscreenElement && currentlyPlaying) {
+                    const overlay = currentlyPlaying.closest('.video-wrapper').querySelector('.video-overlay');
+                    if (overlay && !currentlyPlaying.paused) {
+                        overlay.querySelector('.play-button i').className = 'fas fa-pause';
+                    }
+                }
+            }
+            
+            // Video ended event to show overlay again
+            document.querySelectorAll('.video').forEach(video => {
+                video.addEventListener('ended', function() {
+                    const overlay = this.closest('.video-wrapper').querySelector('.video-overlay');
+                    overlay.style.opacity = '1';
+                    overlay.style.pointerEvents = 'auto';
+                    overlay.querySelector('.play-button i').className = 'fas fa-play';
+                    currentlyPlaying = null;
+                });
+                
+                // Pause event to handle when user manually pauses
+                video.addEventListener('pause', function() {
+                    if (currentlyPlaying === this) {
+                        const overlay = this.closest('.video-wrapper').querySelector('.video-overlay');
+                        overlay.style.opacity = '1';
+                        overlay.style.pointerEvents = 'auto';
+                        overlay.querySelector('.play-button i').className = 'fas fa-play';
+                        currentlyPlaying = null;
+                    }
+                });
+            });
+            
+            // Save button functionality
+            document.querySelectorAll('.save-btn').forEach(button => {
+                const videoCard = button.closest('.video-card');
+                const videoId = videoCard.dataset.videoId;
+                
+                // Set initial saved state
+                if (savedVideos.includes(videoId)) {
+                    button.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                    button.classList.add('saved');
+                }
+                
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const videoId = this.closest('.video-card').dataset.videoId;
+                    const index = savedVideos.indexOf(videoId);
+                    
+                    if (index === -1) {
+                        // Save video
+                        savedVideos.push(videoId);
+                        this.innerHTML = '<i class="fas fa-bookmark"></i> Saved';
+                        this.classList.add('saved');
+                        
+                        // Show feedback
+                        showSaveFeedback('Video saved!');
+                    } else {
+                        // Unsave video
+                        savedVideos.splice(index, 1);
+                        this.innerHTML = '<i class="far fa-bookmark"></i> Save';
+                        this.classList.remove('saved');
+                        
+                        // Show feedback
+                        showSaveFeedback('Video removed!');
+                        
+                        // If we're on the saved page, hide the video
+                        const currentTab = document.querySelector('.sidenav-menu li.active a').getAttribute('href');
+                        if (currentTab === '#saved') {
+                            this.closest('.video-card').style.display = 'none';
+                            
+                            // Check if there are no more saved videos
+                            const remainingSavedVideos = document.querySelectorAll('.video-card[style="display: block;"]').length;
+                            if (remainingSavedVideos === 0) {
+                                document.querySelector('.section-header').innerHTML = `
+                                    <h2><i class="fas fa-bookmark"></i> No Saved Performances</h2>
+                                    <p>Save performances by clicking the "Save" button on videos</p>
+                                `;
+                            }
+                        }
+                    }
+                    
+                    // Update local storage
+                    localStorage.setItem('savedVideos', JSON.stringify(savedVideos));
+                });
+            });
+            
+            // Side navigation click handlers
+            document.querySelectorAll('.sidenav-menu a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('href').substring(1);
+                    
+                    // Update active state
+                    document.querySelectorAll('.sidenav-menu li').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    this.closest('li').classList.add('active');
+                    
+                    // Handle different menu items
+                    if (target === 'saved') {
+                        showSavedVideos();
+                    } else if (target === 'featured') {
+                        showAllVideos('Featured Performances', 'Experience the magic of traditional music through these captivating performances');
+                    } else {
+                        // For instrument categories
+                        showCategoryVideos(target);
+                    }
+                });
+            });
+            
+            // Function to show only saved videos
+            function showSavedVideos() {
+                const videoCards = document.querySelectorAll('.video-card');
+                let hasSavedVideos = false;
+                
+                videoCards.forEach(card => {
+                    const videoId = card.dataset.videoId;
+                    if (savedVideos.includes(videoId)) {
+                        card.style.display = 'block';
+                        hasSavedVideos = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Update section header
+                const sectionHeader = document.querySelector('.section-header');
+                if (hasSavedVideos) {
+                    sectionHeader.innerHTML = `
+                        <h2><i class="fas fa-bookmark"></i> Saved Performances</h2>
+                        <p>Your collection of saved performances</p>
+                    `;
+                } else {
+                    sectionHeader.innerHTML = `
+                        <h2><i class="fas fa-bookmark"></i> No Saved Performances</h2>
+                        <p>Save performances by clicking the "Save" button on videos</p>
+                    `;
+                }
+            }
+            
+            // Function to show all videos
+            function showAllVideos(title, description) {
+                document.querySelectorAll('.video-card').forEach(card => {
+                    card.style.display = 'block';
+                });
+                
+                // Update section header
+                document.querySelector('.section-header').innerHTML = `
+                    <h2><i class="fas fa-theater-masks"></i> ${title}</h2>
+                    <p>${description}</p>
+                `;
+            }
+            
+            // Function to show videos by category
+            function showCategoryVideos(category) {
+                const videoCards = document.querySelectorAll('.video-card');
+                let hasCategoryVideos = false;
+                
+                videoCards.forEach(card => {
+                    const categories = card.dataset.categories.split(' ');
+                    if (categories.includes(category)) {
+                        card.style.display = 'block';
+                        hasCategoryVideos = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Update section header
+                const sectionHeader = document.querySelector('.section-header');
+                if (hasCategoryVideos) {
+                    const categoryName = getCategoryName(category);
+                    sectionHeader.innerHTML = `
+                        <h2><i class="${getCategoryIcon(category)}"></i> ${categoryName} Performances</h2>
+                        <p>Explore our collection of ${categoryName.toLowerCase()} performances</p>
+                    `;
+                } else {
+                    const categoryName = getCategoryName(category);
+                    sectionHeader.innerHTML = `
+                        <h2><i class="${getCategoryIcon(category)}"></i> No ${categoryName} Performances</h2>
+                        <p>We currently don't have any ${categoryName.toLowerCase()} performances available</p>
+                    `;
+                }
+            }
+            
+            // Helper function to show save feedback
+            function showSaveFeedback(message) {
+                const feedback = document.createElement('div');
+                feedback.className = 'save-feedback';
+                feedback.textContent = message;
+                document.body.appendChild(feedback);
+                
+                setTimeout(() => {
+                    feedback.classList.add('show');
+                }, 10);
+                
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(feedback);
+                    }, 300);
+                }, 2000);
+            }
+            
+            // Helper function to get category name
+            function getCategoryName(category) {
+                return category.charAt(0).toUpperCase() + category.slice(1);
+            }
+            
+            // Helper function to get category icon
+            function getCategoryIcon(category) {
+                const defaultIcons = {
+                    'aerophones': 'fas fa-wind',
+                    'chordophones': 'fas fa-guitar',
+                    'idiophones': 'fas fa-drum',
+                    'membranophones': 'fas fa-drum-steelpan'
+                };
+                return defaultIcons[category] || 'fas fa-music';
+            }
+            
+            // Side navigation scroll functionality
+            const sidenavMenu = document.querySelector('.sidenav-menu');
+            const prevButton = document.querySelector('.prev-button');
+            const nextButton = document.querySelector('.next-button');
+            
+            function updateNavButtons() {
+                const scrollLeft = sidenavMenu.scrollLeft;
+                const maxScroll = sidenavMenu.scrollWidth - sidenavMenu.clientWidth;
+                
+                prevButton.disabled = scrollLeft <= 10;
+                nextButton.disabled = scrollLeft >= maxScroll - 10;
+            }
+            
+            if (prevButton && nextButton) {
+                prevButton.addEventListener('click', () => {
+                    sidenavMenu.scrollBy({
+                        left: -200,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                nextButton.addEventListener('click', () => {
+                    sidenavMenu.scrollBy({
+                        left: 200,
+                        behavior: 'smooth'
+                    });
+                });
+                
+                sidenavMenu.addEventListener('scroll', updateNavButtons);
+                
+                // Initialize button states
+                updateNavButtons();
+                
+                // Hide buttons when not scrollable
+                const observer = new ResizeObserver(() => {
+                    const isScrollable = sidenavMenu.scrollWidth > sidenavMenu.clientWidth;
+                    prevButton.style.display = isScrollable ? 'flex' : 'none';
+                    nextButton.style.display = isScrollable ? 'flex' : 'none';
+                    updateNavButtons();
+                });
+                
+                observer.observe(sidenavMenu);
+            }
         });
-        this.closest('li').classList.add('active');
-        
-        // Handle different menu items
-        if (target === 'saved') {
-          showSavedVideos();
-        } else if (target === 'featured') {
-          showAllVideos('Featured Performances', 'Experience the magic of traditional music through these captivating performances');
-        } else {
-          // For instrument categories
-          showCategoryVideos(target);
-        }
-      });
-    });
-    
-    // Function to show only saved videos
-    function showSavedVideos() {
-      const videoCards = document.querySelectorAll('.video-card');
-      let hasSavedVideos = false;
-      
-      videoCards.forEach(card => {
-        const videoId = card.dataset.videoId;
-        if (savedVideos.includes(videoId)) {
-          card.style.display = 'block';
-          hasSavedVideos = true;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-      
-      // Update section header
-      const sectionHeader = document.querySelector('.section-header');
-      if (hasSavedVideos) {
-        sectionHeader.innerHTML = `
-          <h2><i class="fas fa-bookmark"></i> Saved Performances</h2>
-          <p>Your collection of saved performances</p>
-        `;
-      } else {
-        sectionHeader.innerHTML = `
-          <h2><i class="fas fa-bookmark"></i> No Saved Performances</h2>
-          <p>Save performances by clicking the "Save" button on videos</p>
-        `;
-      }
-    }
-    
-    // Function to show all videos
-    function showAllVideos(title, description) {
-      document.querySelectorAll('.video-card').forEach(card => {
-        card.style.display = 'block';
-      });
-      
-      // Update section header
-      document.querySelector('.section-header').innerHTML = `
-        <h2><i class="fas fa-theater-masks"></i> ${title}</h2>
-        <p>${description}</p>
-      `;
-    }
-    
-    // Function to show videos by category
-    function showCategoryVideos(category) {
-      const videoCards = document.querySelectorAll('.video-card');
-      let hasCategoryVideos = false;
-      
-      videoCards.forEach(card => {
-        const categories = card.dataset.categories.split(' ');
-        if (categories.includes(category)) {
-          card.style.display = 'block';
-          hasCategoryVideos = true;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-      
-      // Update section header
-      const sectionHeader = document.querySelector('.section-header');
-      if (hasCategoryVideos) {
-        const categoryName = getCategoryName(category);
-        sectionHeader.innerHTML = `
-          <h2><i class="${getCategoryIcon(category)}"></i> ${categoryName} Performances</h2>
-          <p>Explore our collection of ${categoryName.toLowerCase()} performances</p>
-        `;
-      } else {
-        const categoryName = getCategoryName(category);
-        sectionHeader.innerHTML = `
-          <h2><i class="${getCategoryIcon(category)}"></i> No ${categoryName} Performances</h2>
-          <p>We currently don't have any ${categoryName.toLowerCase()} performances available</p>
-        `;
-      }
-    }
-    
-    // Helper function to show save feedback
-    function showSaveFeedback(message) {
-      const feedback = document.createElement('div');
-      feedback.className = 'save-feedback';
-      feedback.textContent = message;
-      document.body.appendChild(feedback);
-      
-      setTimeout(() => {
-        feedback.classList.add('show');
-      }, 10);
-      
-      setTimeout(() => {
-        feedback.classList.remove('show');
-        setTimeout(() => {
-          document.body.removeChild(feedback);
-        }, 300);
-      }, 2000);
-    }
-    
-    // Helper function to get category name
-    function getCategoryName(category) {
-      return category.charAt(0).toUpperCase() + category.slice(1);
-    }
-    
-    // Helper function to get category icon
-    function getCategoryIcon(category) {
-      const defaultIcons = {
-        'aerophones': 'fas fa-wind',
-        'chordophones': 'fas fa-guitar',
-        'idiophones': 'fas fa-drum',
-        'membranophones': 'fas fa-drum-steelpan'
-      };
-      return defaultIcons[category] || 'fas fa-music';
-    }
-    
-    // Helper function to get CSRF token
-    function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-
-    // Side navigation scroll functionality
-    const sidenavMenu = document.querySelector('.sidenav-menu');
-    const prevButton = document.querySelector('.prev-button');
-    const nextButton = document.querySelector('.next-button');
-
-    function updateNavButtons() {
-      const scrollLeft = sidenavMenu.scrollLeft;
-      const maxScroll = sidenavMenu.scrollWidth - sidenavMenu.clientWidth;
-      
-      prevButton.disabled = scrollLeft <= 10;
-      nextButton.disabled = scrollLeft >= maxScroll - 10;
-    }
-
-    if (prevButton && nextButton) {
-      prevButton.addEventListener('click', () => {
-        sidenavMenu.scrollBy({
-          left: -200,
-          behavior: 'smooth'
-        });
-      });
-
-      nextButton.addEventListener('click', () => {
-        sidenavMenu.scrollBy({
-          left: 200,
-          behavior: 'smooth'
-        });
-      });
-
-      sidenavMenu.addEventListener('scroll', updateNavButtons);
-
-      // Initialize button states
-      updateNavButtons();
-
-      // Hide buttons when not scrollable
-      const observer = new ResizeObserver(() => {
-        const isScrollable = sidenavMenu.scrollWidth > sidenavMenu.clientWidth;
-        prevButton.style.display = isScrollable ? 'flex' : 'none';
-        nextButton.style.display = isScrollable ? 'flex' : 'none';
-        updateNavButtons();
-      });
-
-      observer.observe(sidenavMenu);
-    }
-});
-</script>
+    </script>
   <!-- VIDEO --><!-- VIDEO --><!-- VIDEO --><!-- VIDEO -->
 
 

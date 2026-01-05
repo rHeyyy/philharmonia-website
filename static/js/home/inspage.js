@@ -794,45 +794,229 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN
 // INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced Intersection Observer with delay
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => {
-            entry.target.classList.add('visible');
-          }, index * 150);
+    // VIDEO MANAGEMENT SYSTEM
+    class VideoManager {
+        constructor() {
+            this.videos = [];
+            this.currentlyPlaying = null;
+            this.visibilityObserver = null;
+            this.setupVideoManager();
         }
-      });
+
+        setupVideoManager() {
+            // Initialize all video elements
+            this.initVideos();
+            
+            // Setup intersection observer for visibility
+            this.setupVisibilityObserver();
+            
+            // Setup play/pause event listeners
+            this.setupEventListeners();
+        }
+
+        initVideos() {
+            const videoElements = document.querySelectorAll('video');
+            videoElements.forEach(video => {
+                const videoObj = {
+                    element: video,
+                    isPlaying: false,
+                    wasPlayingBeforeHidden: false
+                };
+                
+                this.videos.push(videoObj);
+                
+                // Add data attribute for tracking
+                video.dataset.videoId = `video-${this.videos.length}`;
+            });
+        }
+
+        setupVisibilityObserver() {
+            this.visibilityObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target;
+                    const videoObj = this.findVideoByElement(video);
+                    
+                    if (!videoObj) return;
+                    
+                    if (entry.isIntersecting) {
+                        // Video became visible
+                        if (videoObj.wasPlayingBeforeHidden && this.currentlyPlaying !== video) {
+                            // Only auto-play if no other video is currently playing
+                            if (!this.currentlyPlaying) {
+                                video.play().catch(e => console.log("Autoplay prevented:", e));
+                            }
+                        }
+                    } else {
+                        // Video became invisible
+                        if (!video.paused) {
+                            videoObj.wasPlayingBeforeHidden = true;
+                            video.pause();
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.3, // At least 30% visible
+                rootMargin: '50px' // Add some margin for smoother transitions
+            });
+
+            // Observe all videos
+            this.videos.forEach(videoObj => {
+                this.visibilityObserver.observe(videoObj.element);
+            });
+        }
+
+        setupEventListeners() {
+            this.videos.forEach(videoObj => {
+                const video = videoObj.element;
+                
+                // Play event
+                video.addEventListener('play', (e) => {
+                    this.handlePlay(e.target);
+                });
+                
+                // Pause event
+                video.addEventListener('pause', (e) => {
+                    this.handlePause(e.target);
+                });
+                
+                // Click on video toggles play/pause
+                video.addEventListener('click', (e) => {
+                    this.handleVideoClick(e.target);
+                });
+                
+                // When user interacts with controls
+                video.addEventListener('playing', (e) => {
+                    this.handlePlay(e.target);
+                });
+            });
+            
+            // Pause videos when page becomes hidden (tab switch)
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    this.pauseAllVideos();
+                }
+            });
+            
+            // Pause videos when window loses focus
+            window.addEventListener('blur', () => {
+                this.pauseAllVideos();
+            });
+        }
+
+        handlePlay(videoElement) {
+            // If a different video is already playing, pause it
+            if (this.currentlyPlaying && this.currentlyPlaying !== videoElement) {
+                this.currentlyPlaying.pause();
+                
+                // Reset the wasPlaying flag for the paused video
+                const previousVideoObj = this.findVideoByElement(this.currentlyPlaying);
+                if (previousVideoObj) {
+                    previousVideoObj.wasPlayingBeforeHidden = false;
+                }
+            }
+            
+            // Set the new currently playing video
+            this.currentlyPlaying = videoElement;
+            
+            // Update video object state
+            const videoObj = this.findVideoByElement(videoElement);
+            if (videoObj) {
+                videoObj.isPlaying = true;
+                videoObj.wasPlayingBeforeHidden = false;
+            }
+        }
+
+        handlePause(videoElement) {
+            // If the paused video was the currently playing one, clear it
+            if (this.currentlyPlaying === videoElement) {
+                this.currentlyPlaying = null;
+            }
+            
+            // Update video object state
+            const videoObj = this.findVideoByElement(videoElement);
+            if (videoObj) {
+                videoObj.isPlaying = false;
+            }
+        }
+
+        handleVideoClick(videoElement) {
+            if (videoElement.paused) {
+                videoElement.play();
+            } else {
+                videoElement.pause();
+            }
+        }
+
+        findVideoByElement(videoElement) {
+            return this.videos.find(v => v.element === videoElement);
+        }
+
+        pauseAllVideos() {
+            this.videos.forEach(videoObj => {
+                if (!videoObj.element.paused) {
+                    videoObj.wasPlayingBeforeHidden = true;
+                    videoObj.element.pause();
+                }
+            });
+            this.currentlyPlaying = null;
+        }
+
+        // Cleanup method (optional)
+        destroy() {
+            if (this.visibilityObserver) {
+                this.videos.forEach(videoObj => {
+                    this.visibilityObserver.unobserve(videoObj.element);
+                });
+                this.visibilityObserver.disconnect();
+            }
+        }
+    }
+
+    // Initialize Video Manager
+    const videoManager = new VideoManager();
+
+    // Your existing animation code (keep this)
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 150);
+            }
+        });
     }, { 
-      threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px'
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
     });
     
-    // Observe all animated elements
     const elementsToAnimate = [
-      '.header', 
-      '.image-description', 
-      '.video-section', 
-      '.learn-more'
+        '.header', 
+        '.image-description', 
+        '.video-section', 
+        '.learn-more'
     ];
     
     elementsToAnimate.forEach(selector => {
-      document.querySelectorAll(selector).forEach(el => {
-        observer.observe(el);
-      });
+        document.querySelectorAll(selector).forEach(el => {
+            observer.observe(el);
+        });
     });
     
     // Smooth scroll for arrow click
-    document.querySelector('.arrow-down').addEventListener('click', () => {
-      const ctaSection = document.querySelector('.cta-section');
-      ctaSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'center'
-      });
-    });
-  });
+    const arrowDown = document.querySelector('.arrow-down');
+    if (arrowDown) {
+        arrowDown.addEventListener('click', () => {
+            const ctaSection = document.querySelector('.cta-section');
+            if (ctaSection) {
+                ctaSection.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        });
+    }
+});
 
 // INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN
 // INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN// INSTRUCTOR SECTION DESIGN

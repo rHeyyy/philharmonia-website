@@ -649,7 +649,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Show success message with countdown
             let countdown = 5; // 5 seconds countdown
-            const successMessage = data.message || "Appointment submitted successfully! Please wait for our response.";
+            const successMessage = data.message || "";
             
             // Show initial success message
             showError(errorElement, `${successMessage}<br><small>Page will refresh in ${countdown} seconds...</small>`, true);

@@ -114,6 +114,259 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+ // JavaScript for edit functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Edit button click handler
+        document.querySelectorAll('.edit-appointment-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const appointmentId = this.getAttribute('data-appointment-id');
+                toggleEditMode(appointmentId, true);
+            });
+        });
+        
+        // Cancel edit button click handler
+        document.querySelectorAll('.cancel-edit').forEach(button => {
+            button.addEventListener('click', function() {
+                const appointmentId = this.getAttribute('data-appointment-id');
+                toggleEditMode(appointmentId, false);
+            });
+        });
+        
+        // Form submission handler
+        document.querySelectorAll('.edit-appointment-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                // Basic validation
+                if (!validateEditForm(this)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Saving...';
+                submitBtn.disabled = true;
+                
+                // Re-enable after 3 seconds if still there (in case of error)
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }, 3000);
+            });
+        });
+        
+        // Prevent past dates in date inputs
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            input.setAttribute('min', today);
+        });
+    });
+    
+    function toggleEditMode(appointmentId, showEdit) {
+        const viewMode = document.getElementById(`view-mode-${appointmentId}`);
+        const editMode = document.getElementById(`edit-mode-${appointmentId}`);
+        const appointmentCard = document.getElementById(`appointment-card-${appointmentId}`);
+        
+        if (showEdit) {
+            viewMode.style.display = 'none';
+            editMode.style.display = 'block';
+            appointmentCard.classList.add('editing');
+            // Scroll to the form
+            editMode.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            viewMode.style.display = 'block';
+            editMode.style.display = 'none';
+            appointmentCard.classList.remove('editing');
+        }
+    }
+    
+    function validateEditForm(form) {
+        // Check required fields
+        const requiredInputs = form.querySelectorAll('[required]');
+        for (let input of requiredInputs) {
+            if (!input.value.trim()) {
+                alert(`Please fill in the ${input.previousElementSibling.textContent.replace(':', '').trim()} field.`);
+                input.focus();
+                return false;
+            }
+        }
+        
+        // Validate date is not in the past
+        const dateInput = form.querySelector('input[type="date"]');
+        if (dateInput) {
+            const selectedDate = new Date(dateInput.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                alert('Appointment date cannot be in the past.');
+                dateInput.focus();
+                return false;
+            }
+        }
+        
+        // Validate class size for lessons
+        const classSizeInput = form.querySelector('input[name="class_size"]');
+        if (classSizeInput && (classSizeInput.value < 1 || classSizeInput.value > 100)) {
+            alert('Class size must be between 1 and 100 students.');
+            classSizeInput.focus();
+            return false;
+        }
+        
+        return true;
+    }
+       // JavaScript for inline editing functionality
+    
+    function enableEditMode(appointmentId) {
+        // Hide view mode
+        const viewMode = document.getElementById(`view-mode-${appointmentId}`);
+        viewMode.style.display = 'none';
+        
+        // Show edit mode
+        const editMode = document.getElementById(`edit-mode-${appointmentId}`);
+        editMode.style.display = 'block';
+        
+        // Add editing class to card
+        const appointmentCard = document.getElementById(`appointment-card-${appointmentId}`);
+        appointmentCard.classList.add('editing');
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        const dateInput = editMode.querySelector('input[type="date"]');
+        if (dateInput) {
+            dateInput.min = today;
+        }
+        
+        // Focus on first input
+        const firstInput = editMode.querySelector('input');
+        if (firstInput) {
+            firstInput.focus();
+        }
+        
+        // Scroll to the card
+        appointmentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    function cancelEdit(appointmentId) {
+        // Show view mode
+        const viewMode = document.getElementById(`view-mode-${appointmentId}`);
+        viewMode.style.display = 'block';
+        
+        // Hide edit mode
+        const editMode = document.getElementById(`edit-mode-${appointmentId}`);
+        editMode.style.display = 'none';
+        
+        // Remove editing class
+        const appointmentCard = document.getElementById(`appointment-card-${appointmentId}`);
+        appointmentCard.classList.remove('editing');
+    }
+    
+    function validatePerformanceForm(appointmentId) {
+        const form = document.getElementById(`edit-form-${appointmentId}`);
+        const inputs = form.querySelectorAll('input[required]');
+        
+        for (let input of inputs) {
+            if (!input.value.trim()) {
+                alert(`Please fill in the ${input.previousElementSibling.textContent.replace(':', '').trim()} field.`);
+                input.focus();
+                return false;
+            }
+        }
+        
+        // Validate date
+        const dateInput = form.querySelector('input[name="event_date"]');
+        if (dateInput.value) {
+            const selectedDate = new Date(dateInput.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                alert('Appointment date cannot be in the past.');
+                dateInput.focus();
+                return false;
+            }
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('.btn-save');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+        
+        // Re-enable after 5 seconds if still there (in case of error)
+        setTimeout(() => {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }, 5000);
+        
+        return true;
+    }
+    
+    function validateLessonForm(appointmentId) {
+        const form = document.getElementById(`edit-form-${appointmentId}`);
+        const inputs = form.querySelectorAll('input[required]');
+        
+        for (let input of inputs) {
+            if (!input.value.trim()) {
+                alert(`Please fill in the ${input.previousElementSibling.textContent.replace(':', '').trim()} field.`);
+                input.focus();
+                return false;
+            }
+        }
+        
+        // Validate class size
+        const classSizeInput = form.querySelector('input[name="class_size"]');
+        const classSize = parseInt(classSizeInput.value);
+        if (classSize < 1 || classSize > 100) {
+            alert('Class size must be between 1 and 100 students.');
+            classSizeInput.focus();
+            return false;
+        }
+        
+        // Validate date
+        const dateInput = form.querySelector('input[name="lesson_date"]');
+        if (dateInput.value) {
+            const selectedDate = new Date(dateInput.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                alert('Appointment date cannot be in the past.');
+                dateInput.focus();
+                return false;
+            }
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('.btn-save');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Saving...';
+        submitBtn.disabled = true;
+        
+        // Re-enable after 5 seconds if still there (in case of error)
+        setTimeout(() => {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }, 5000);
+        
+        return true;
+    }
+    
+    // Set minimum date for all date inputs on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        const dateInputs = document.querySelectorAll('input[type="date"]');
+        dateInputs.forEach(input => {
+            input.min = today;
+        });
+        
+        // Hide all edit modes on page load
+        const editModes = document.querySelectorAll('.edit-mode');
+        editModes.forEach(mode => {
+            mode.style.display = 'none';
+        });
+    });
 </script>
 
     <nav class="navbar" id="main-navbar">

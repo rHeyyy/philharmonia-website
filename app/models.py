@@ -926,6 +926,7 @@ class PerformanceAppointment(models.Model):
     event_time = models.TimeField()
     message = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    decline_reason = models.TextField(blank=True, null=True, help_text="Reason for declining the appointment")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -957,6 +958,7 @@ class LessonAppointment(models.Model):
     location = models.CharField(max_length=255)
     message = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    decline_reason = models.TextField(blank=True, null=True, help_text="Reason for declining the appointment")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

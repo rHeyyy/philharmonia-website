@@ -1914,7 +1914,7 @@ class UpdatePerformance(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['Users'] = CustomUser.objects.all()
         return context
-   
+ 
 @login_required
 def performance_Status(request, pk):
     if request.user.role != 'admin':
@@ -1924,9 +1924,23 @@ def performance_Status(request, pk):
 
     if request.method == 'POST':
         status = request.POST.get('status')
+        decline_reason = request.POST.get('decline_reason', '').strip()
+        
         if status in ['Pending', 'Accepted', 'Declined', 'Completed']:
-            PerformanceAppointment.objects.filter(pk=pk).update(status=status)
-            messages.success(request, f'Performance status has been updated to {status}.')
+            # Only update decline_reason if status is being set to Declined
+            if status == 'Declined':
+                PerformanceAppointment.objects.filter(pk=pk).update(
+                    status=status, 
+                    decline_reason=decline_reason
+                )
+                messages.success(request, f'Performance has been declined. Reason: {decline_reason}')
+            else:
+                # Clear decline reason if status is changed from Declined to something else
+                PerformanceAppointment.objects.filter(pk=pk).update(
+                    status=status, 
+                    decline_reason=''
+                )
+                messages.success(request, f'Performance status has been updated to {status}.')
         else:
             messages.error(request, 'Invalid status.')
         return redirect('admin_main')  # Redirect back to the admin dashboard
@@ -1983,9 +1997,23 @@ def Lesson_Status(request, pk):
 
     if request.method == 'POST':
         status = request.POST.get('status')
+        decline_reason = request.POST.get('decline_reason', '').strip()
+        
         if status in ['Pending', 'Accepted', 'Declined', 'Completed']:
-            LessonAppointment.objects.filter(pk=pk).update(status=status)
-            messages.success(request, f'Lesson status has been updated to {status}.')
+            # Only update decline_reason if status is being set to Declined
+            if status == 'Declined':
+                LessonAppointment.objects.filter(pk=pk).update(
+                    status=status, 
+                    decline_reason=decline_reason
+                )
+                messages.success(request, f'Lesson has been declined. Reason: {decline_reason}')
+            else:
+                # Clear decline reason if status is changed from Declined to something else
+                LessonAppointment.objects.filter(pk=pk).update(
+                    status=status, 
+                    decline_reason=''
+                )
+                messages.success(request, f'Lesson status has been updated to {status}.')
         else:
             messages.error(request, 'Invalid status.')
         return redirect('admin_main')  # Redirect back to the admin dashboard
@@ -2400,6 +2428,101 @@ def update_profile(request, user_id):
     }
     
     return render(request, 'app/user/update-profile.html', context)
+@login_required
+def update_performance(request, pk):
+    """Update a performance appointment (user only)"""
+    appointment = get_object_or_404(PerformanceAppointment, pk=pk)
+    
+    # Ensure only the owner can update their appointment
+    if appointment.user != request.user:
+        messages.error(request, 'You can only update your own appointments.')
+        return redirect('user_home')
+    
+    # Ensure only pending appointments can be updated
+    if appointment.status != 'Pending':
+        messages.error(request, 'Only pending appointments can be updated.')
+        return redirect('user_home')
+    
+    if request.method == 'POST':
+        # Get form data
+        event_name = request.POST.get('event_name', '').strip()
+        event_type = request.POST.get('event_type', '').strip()
+        event_location = request.POST.get('event_location', '').strip()
+        event_date = request.POST.get('event_date')
+        event_time = request.POST.get('event_time')
+        message = request.POST.get('message', '').strip()
+        
+        # Basic validation
+        if not all([event_name, event_location, event_date, event_time]):
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('user_home')
+        
+        try:
+            # Update appointment
+            appointment.event_name = event_name
+            appointment.event_type = event_type if event_type else None
+            appointment.event_location = event_location
+            appointment.event_date = event_date
+            appointment.event_time = event_time
+            appointment.message = message if message else None
+            appointment.save()
+            
+            messages.success(request, 'Performance appointment updated successfully!')
+        except Exception as e:
+            messages.error(request, f'Error updating appointment: {str(e)}')
+        
+        return redirect('user_home')
+    
+    # If GET request, redirect to home
+    return redirect('user_home')
+
+@login_required
+def update_lesson(request, pk):
+    """Update a lesson appointment (user only)"""
+    appointment = get_object_or_404(LessonAppointment, pk=pk)
+    
+    # Ensure only the owner can update their appointment
+    if appointment.user != request.user:
+        messages.error(request, 'You can only update your own appointments.')
+        return redirect('user_home')
+    
+    # Ensure only pending appointments can be updated
+    if appointment.status != 'Pending':
+        messages.error(request, 'Only pending appointments can be updated.')
+        return redirect('user_home')
+    
+    if request.method == 'POST':
+        # Get form data
+        school_name = request.POST.get('school_name', '').strip()
+        class_size = request.POST.get('class_size', '1')
+        location = request.POST.get('location', '').strip()
+        lesson_date = request.POST.get('lesson_date')
+        lesson_time = request.POST.get('lesson_time')
+        message = request.POST.get('message', '').strip()
+        
+        # Basic validation
+        if not all([school_name, location, lesson_date, lesson_time]):
+            messages.error(request, 'Please fill in all required fields.')
+            return redirect('user_home')
+        
+        try:
+            # Update appointment
+            appointment.school_name = school_name
+            appointment.class_size = int(class_size)
+            appointment.location = location
+            appointment.lesson_date = lesson_date
+            appointment.lesson_time = lesson_time
+            appointment.message = message if message else None
+            appointment.save()
+            
+            messages.success(request, 'Lesson appointment updated successfully!')
+        except Exception as e:
+            messages.error(request, f'Error updating appointment: {str(e)}')
+        
+        return redirect('user_home')
+    
+    # If GET request, redirect to home
+    return redirect('user_home')
 
 @login_required
 def cancel_performance(request, appointment_id):
