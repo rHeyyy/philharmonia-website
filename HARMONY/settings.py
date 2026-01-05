@@ -212,8 +212,8 @@ if IS_PRODUCTION:
     CSRF_COOKIE_SECURE = True
     DEBUG = False
     
-    # Static files with WhiteNoise
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    # 🔥 FIX: Static files with WhiteNoise - Use CompressedStaticFilesStorage
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # ================= CLOUDFLARE R2 CONFIGURATION =================
 # Support both R2_ and AWS_ environment variable names
